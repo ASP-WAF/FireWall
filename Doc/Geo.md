@@ -1,4 +1,4 @@
-﻿__[Home](help.md) | [TagHelpers](taghelpers.md) | Geo | [FireWall Rules](Rules.md)__
+﻿__[Home](help.md) | [TagHelpers](TagHelpers.md) | Geo | [FireWall Rules](Rules.md)__
 
 # Configuring Geo middleware and tag helpers
 
