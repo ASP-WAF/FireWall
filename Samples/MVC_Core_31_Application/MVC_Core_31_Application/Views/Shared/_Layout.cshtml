@@ -1,0 +1,101 @@
+﻿@inject Walter.Web.FireWall.IPageRequest request
+@using Microsoft.AspNetCore.Http.Features
+
+@{
+    var consentFeature = Context.Features.Get<ITrackingConsentFeature>();
+    var showBanner = !consentFeature?.CanTrack ?? false;
+    var cookieString = consentFeature?.CreateConsentCookie();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MVC_Core_31_Application</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+        @if (showBanner)
+    {
+        <div id="cookieConsent" class="alert alert-info alert-dismissible fade show" role="alert">
+            Use this space to summarize your privacy and cookie use policy. <a asp-page="/Privacy">Learn More</a>.
+            <button type="button" class="accept-policy close" data-dismiss="alert" aria-label="Close" data-cookie-string="@cookieString">
+                <span aria-hidden="true">Accept</span>
+            </button>
+        </div>
+        <script>
+            (function () {
+                var button = document.querySelector("#cookieConsent button[data-cookie-string]");
+                button.addEventListener("click", function (event) {
+                    document.cookie = button.dataset.cookieString;
+                }, false);
+            })();
+        </script>
+    }
+
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">MVC_Core_31_Application</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+            <nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      @for (var i = 0; i < request.BreadCrumbs.Count; i++)
+      {
+          if (request.BreadCrumbs.Count - 1 > i)
+          {
+              <li class="breadcrumb-item"><a href="@request.BreadCrumbs[i].GetRelativeUrl(request)">@request.BreadCrumbs[i]</a></li>
+          }
+          else
+          {
+             <li class="breadcrumb-item active"><a href="@request.BreadCrumbs[i].GetRelativeUrl(request)">@request.BreadCrumbs[i]</a></li>
+          }
+      }
+
+  </ol>
+                </nav>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2020 - MVC_Core_31_Application - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    @*Inject firewall user discovery script in the view template*@
+    <script src="@Url.Content(MVC_Core_31_Application.Links.UserEndpointJavaScript)"></script>
+
+    @*
+        if you use NuGet package Walter.Web.FireWall.DefaultEndpoints then use:
+        <script src="@Url.Content(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.UserEndpointJavaScript)"></script>
+
+        see the readme.txt in NuGet package Walter.Web.FireWall.DefaultEndpoints for more implementation samples
+    *@
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

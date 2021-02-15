@@ -1,0 +1,142 @@
+﻿@model ErrorViewModel
+@inject Walter.Web.FireWall.IPageRequest pageRequest
+@{
+    ViewData["Title"] = "Error";
+    var isp = await pageRequest.GetAbuseContactAsync().ConfigureAwait(false);
+    var fwUser = pageRequest.User.AsFirewallUser();
+}
+
+<h1 class="text-danger">Error.</h1>
+<h2 class="text-danger">An error occurred while processing your request.</h2>
+
+@if (Model.ShowRequestId)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+    </p>
+
+    <h1 class="text-danger">Error.</h1>
+    <h2 class="text-danger">An error occurred while processing your request.</h2>
+    <p>        
+        We discovered the following error details:
+        <ol>
+            @foreach (var item in pageRequest.Exceptions)
+            {
+                <li>
+                    <span class="text-warning"> @item.GetType().Name</span><br />
+                    <span class="text-secondary">@item.Message</span>
+                <ul>
+                    <li>@item.GetType().Name</li>
+                    <li>Class: @item.ClassName()</li>
+                    <li>File : @item.FileName()</li>
+                    <li>Line : @item.CodeLineNumber()</li>
+                    <li>Signature: @(new Walter.ExceptionObject(item).Signature)</li>
+                    <li>
+                        stack frames:
+                        <ol>
+                            @foreach (var frame in item.Frames().StackedFrames)
+                            {
+                                <li>Namespace:@frame.Namespace</li>
+                                <li>Method:@frame.MethodName</li>
+                                <li>Class:@frame.ClassName</li>
+                                <li>File:@frame.FileName</li>
+                                <li>Line:@frame.Line</li>                                
+                                <li>Assembly Created:@frame.File.CreationTime.ToLocalTime().ToShortDateString()</li>
+                                <li>Assembly Version:@frame.FileOwner.FileVersion</li>
+                                <li>Product:@frame.FileOwner.ProductName</li>
+                                <li>Company:@frame.FileOwner.CompanyName</li>
+                            }
+                        </ol>
+                    </li>
+                </ul>
+                </li>
+            }
+        </ol>
+    </p>
+    <h2>We discovered following firewall violations:</h2>
+    <ol>
+        <li>
+            The request:
+            <ul class="list-unstyled">
+                <li>URL: @pageRequest.OriginalUrl.AbsoluteUri</li>
+                <li>IP: @pageRequest.IPAddress.ToString()</li>
+                <li>Session: @pageRequest.DurationCurrentSession</li>
+                <li>DNS: @pageRequest.GetDns().DnsDomainName</li>
+                <li>DNS: @pageRequest.GetDns().DnsName</li>
+                <il>ISP: @isp.Name</il>
+                <li>@string.Join("<br/>", @isp.Address.Split(Environment.NewLine))</li>
+                <li>ISP EMail: @isp.EMail</li>
+                <li>ISP Comments:<br />@isp.Remarks</li>
+            </ul>
+        </li>
+        <li>
+            The user:
+            <ul>
+                <li>Pref Page: @fwUser.Referrer</li>
+                <li>Type: @fwUser.UserType</li>
+                <li>Blocked: @fwUser.ViolationsBlockCount</li>
+                <li>Bad Models: @fwUser.ModelBlockCount</li>
+                <li>Location: @fwUser.Location</li>
+                <li>Is Spoofing: @fwUser.IsSpoofing</li>
+            </ul>
+        </li>
+        <li>
+            The Modules:
+            <ul class="list-unstyled">
+                @foreach (var module in pageRequest.GetGuardValuations())
+                {
+                    <li>Step:@module.Step</li>
+                    <li>Passed:@module.Evaluated</li>
+                    <li>Message:@module.IssueReason</li>
+                }
+            </ul>
+        </li>
+
+        <li>
+            Violation stack
+
+            <ol>
+                @foreach (var item in pageRequest.ViolationsStack)
+                {
+                    <li>
+                        <ul class="list-unstyled">
+                            <li>Module:@item.Module</li>
+                            <li>Reason:@item.Reason</li>
+                            <li>Route :@item.Route.ToString()</li>
+                        </ul>
+                    </li>
+                }
+            </ol>
+        </li>
+    </ol>
+
+
+    <h3>Previous incidents</h3>
+    <p>We logged the following incidents for this user:
+        <ol>
+            @foreach (var incident in pageRequest.Incidents())
+            {
+                <li>context:@incident.Context</li>
+                <li>reason:@incident.Reason</li>
+                <li>Registered:@incident.Reported</li>
+                <li>Expires:@incident.Expires</li>
+                <li>IP:@incident.IPAddress</li>
+                <li>Redirected:@incident.WasRedirected</li>
+                <li>URLS : @incident.Path</li>
+                <li>@incident.Description</li>
+            }
+        </ol>
+    </p>
+    
+}
+
+<h3>Development Mode</h3>
+<p>
+    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
+</p>
+<p>
+    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
+    It can result in displaying sensitive information from exceptions to end users.
+    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
+    and restarting the app.
+</p>
