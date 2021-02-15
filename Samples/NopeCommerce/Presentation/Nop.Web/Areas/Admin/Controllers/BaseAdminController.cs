@@ -16,6 +16,7 @@ namespace Nop.Web.Areas.Admin.Controllers
     [AuthorizeAdmin]
     [ValidateVendor]
     [SaveSelectedTab]
+
     public abstract partial class BaseAdminController : BaseController
     {
         /// <summary>
@@ -27,8 +28,7 @@ namespace Nop.Web.Areas.Admin.Controllers
         {
             //use IsoDateFormat on writing JSON text to fix issue with dates in grid
             var useIsoDateFormat = EngineContext.Current.Resolve<AdminAreaSettings>()?.UseIsoDateFormatInJsonResult ?? false;
-            var serializerSettings = EngineContext.Current.Resolve<IOptions<MvcNewtonsoftJsonOptions>>()?.Value?.SerializerSettings
-                ?? new JsonSerializerSettings();
+            var serializerSettings = new JsonSerializerSettings();
 
             if (!useIsoDateFormat)
                 return base.Json(data, serializerSettings);

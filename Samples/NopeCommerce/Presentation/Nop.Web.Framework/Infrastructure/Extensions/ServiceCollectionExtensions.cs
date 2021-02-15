@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using FluentValidation.AspNetCore;
+﻿using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,13 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Serialization;
 using Nop.Core;
 using Nop.Core.Configuration;
 using Nop.Core.Domain;
@@ -34,8 +26,13 @@ using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Framework.Security.Captcha;
 using Nop.Web.Framework.Themes;
 using StackExchange.Profiling.Storage;
+using System;
+using System.Linq;
+using System.Net;
+using System.Reflection;
 using WebMarkupMin.AspNetCore3;
 using WebMarkupMin.NUglify;
+using Newtonsoft;
 
 namespace Nop.Web.Framework.Infrastructure.Extensions
 {
@@ -70,7 +67,9 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
             CommonHelper.DefaultFileProvider = new NopFileProvider(webHostEnvironment);
 
             //initialize plugins
-            var mvcCoreBuilder = services.AddMvcCore();
+            var mvcCoreBuilder = services.AddMvcCore()
+                                         .AddApplicationPart(Assembly.GetAssembly(typeof(Walter.Web.FireWall.DefaultEndpoints.ReportingController)));
+
             mvcCoreBuilder.PartManager.InitializePlugins(nopConfig);
 
             //create engine and configure service provider
@@ -184,23 +183,24 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
                     return redisConnectionWrapper.GetDatabase(nopConfig.RedisDatabaseId ?? (int)RedisDatabaseNumber.DataProtectionKeys);
                 }, NopDataProtectionDefaults.RedisDataProtectionKey);
             }
-            else if (nopConfig.AzureBlobStorageEnabled && nopConfig.UseAzureBlobStorageToStoreDataProtectionKeys)
-            {
-                var cloudStorageAccount = CloudStorageAccount.Parse(nopConfig.AzureBlobStorageConnectionString);
+            //else if (nopConfig.AzureBlobStorageEnabled && nopConfig.UseAzureBlobStorageToStoreDataProtectionKeys)
+            //{
+            //    var cloudStorageAccount = CloudStorageAccount.Parse(nopConfig.AzureBlobStorageConnectionString);
 
-                var client = cloudStorageAccount.CreateCloudBlobClient();
-                var container = client.GetContainerReference(nopConfig.AzureBlobStorageContainerNameForDataProtectionKeys);
+            //    var client = cloudStorageAccount.CreateCloudBlobClient();
+            //    var container = client.GetContainerReference(nopConfig.AzureBlobStorageContainerNameForDataProtectionKeys);
 
-                var dataProtectionBuilder = services.AddDataProtection().PersistKeysToAzureBlobStorage(container, NopDataProtectionDefaults.AzureDataProtectionKeyFile);
+            //    var dataProtectionBuilder = services.AddDataProtection()
+            //                                        .PersistKeysToAzureBlobStorage(container, NopDataProtectionDefaults.AzureDataProtectionKeyFile);
 
-                if (!nopConfig.EncryptDataProtectionKeysWithAzureKeyVault)
-                    return;
+            //    if (!nopConfig.EncryptDataProtectionKeysWithAzureKeyVault)
+            //        return;
 
-                var tokenProvider = new AzureServiceTokenProvider();
-                var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
+            //    var tokenProvider = new AzureServiceTokenProvider();
+            //    var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
 
-                dataProtectionBuilder.ProtectKeysWithAzureKeyVault(keyVaultClient, nopConfig.AzureKeyVaultIdForDataProtectionKeys);
-            }
+            //    dataProtectionBuilder.ProtectKeysWithAzureKeyVault(keyVaultClient, nopConfig.AzureKeyVaultIdForDataProtectionKeys);
+            //}
             else
             {
                 var dataProtectionKeysPath = CommonHelper.DefaultFileProvider.MapPath(NopDataProtectionDefaults.DataProtectionKeysPath);
@@ -270,8 +270,9 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
         {
             //add basic MVC feature
             var mvcBuilder = services.AddControllersWithViews();
+            //mvcBuilder.AddNewtonsoftJson();
+            //mvcBuilder.AddRazorRuntimeCompilation();
 
-            mvcBuilder.AddRazorRuntimeCompilation();
 
             var nopConfig = services.BuildServiceProvider().GetRequiredService<NopConfig>();
             if (nopConfig.UseSessionStateTempDataProvider)
@@ -294,8 +295,7 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
 
             services.AddRazorPages();
 
-            //MVC now serializes JSON with camel case names by default, use this code to avoid it
-            mvcBuilder.AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+
 
             //add custom display metadata provider
             mvcBuilder.AddMvcOptions(options => options.ModelMetadataDetailsProviders.Add(new NopMetadataProvider()));

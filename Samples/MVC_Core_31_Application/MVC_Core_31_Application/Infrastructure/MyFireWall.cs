@@ -133,7 +133,6 @@ namespace MVC_Core_31_Application.Infrastructure
         {
             if (Debugger.IsAttached)
             {
-
                 //pause the application when debugged
                 Debugger.Break();
             }

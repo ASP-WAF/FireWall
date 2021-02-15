@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>    
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>latest</LangVersion>
     <Copyright>Copyright © Nop Solutions, Ltd</Copyright>
     <Company>Nop Solutions, Ltd</Company>
     <Authors>Nop Solutions, Ltd</Authors>
@@ -13,11 +15,12 @@
     <RepositoryType>Git</RepositoryType>
   </PropertyGroup>
 
+
   <ItemGroup>
-    <PackageReference Include="FluentMigrator" Version="3.2.6" />
-    <PackageReference Include="FluentMigrator.Runner" Version="3.2.6" />
+    <PackageReference Include="FluentMigrator" Version="3.2.11" />
+    <PackageReference Include="FluentMigrator.Runner" Version="3.2.11" />
     <PackageReference Include="linq2db" Version="2.9.8" />
-    <PackageReference Include="MySql.Data" Version="8.0.20" />
+    <PackageReference Include="MySql.Data" Version="8.0.23" />
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
   </ItemGroup>
 

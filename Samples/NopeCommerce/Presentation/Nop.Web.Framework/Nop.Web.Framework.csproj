@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework><PlatformTarget>x64</PlatformTarget><LangVersion>latest</LangVersion>
     <Copyright>Copyright © Nop Solutions, Ltd</Copyright>
     <Company>Nop Solutions, Ltd</Company>
     <Authors>Nop Solutions, Ltd</Authors>
@@ -13,11 +13,14 @@
     <RepositoryType>Git</RepositoryType>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BundlerMinifier.Core" Version="3.2.447" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
-    <PackageReference Include="WebMarkupMin.AspNetCore3" Version="2.8.2" />
-    <PackageReference Include="WebMarkupMin.NUglify" Version="2.8.1" />
+  <ItemGroup>   
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="BundlerMinifier.Core" Version="3.2.449" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="9.5.1" />
+    <PackageReference Include="Walter.Web.FireWall.DefaultEndpoints" Version="2021.2.15.3" />
+    <PackageReference Include="WebMarkupMin.AspNetCore3" Version="2.9.2" />
+    <PackageReference Include="WebMarkupMin.NUglify" Version="2.9.2" />
+        <PackageReference Include=" Azure.Extensions.AspNetCore.DataProtection.Blobs" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup>
