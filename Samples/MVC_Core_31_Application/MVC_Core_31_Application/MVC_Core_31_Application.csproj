@@ -10,10 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MartinCostello.SqlLocalDb" Version="3.0.0" />
-    <PackageReference Include="Walter.Web.Firewall" Version="2021.2.15.1" />
-    <PackageReference Include="Walter.Web.FireWall.Geo.Native" Version="2021.2.15.1" />
-    <PackageReference Include="Walter.Web.FireWall.SMTPLogger" Version="2021.2.15.1" />
+    <PackageReference Include="Walter.Web.Firewall" Version="2021.2.15.3" />
+    <PackageReference Include="Walter.Web.FireWall.Geo.Native" Version="2021.2.15.3" />
+    <PackageReference Include="Walter.Web.FireWall.SMTPLogger" Version="2021.2.15.3" />
   </ItemGroup>
 
 </Project>

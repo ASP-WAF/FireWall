@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,143 +14,14 @@ using Walter.Web.FireWall.Destinations.Email;
 namespace MVC_Core_31_Application
 {
 
-    /// <summary>
-    /// this class is used to match the routs needed to communicate data back to the firewall
-    /// </summary>
-    /// <remarks>
-    /// This technique allows you to implement your own naming convention in the MVC pattern
-    /// See the UserDiscoveryController and the service configuration for a demonstration how the data is linked and used
-    /// </remarks>
-    public static class Links
-    {
-        /// <summary>
-        /// registers the links the user would have access to when he visits a page
-        /// </summary>
-        public const string SiteMapEndPoint = "api/SiteMap";
-        /// <summary>
-        /// Is used by the build-in script to communicate user discovery data
-        /// </summary>
-        public const string IsUserEndpoint = "api/UserDiscovery";
-        /// <summary>
-        /// is used to inform the browser to send beacon data when a user leaves a page
-        /// </summary>
-        public const string BeaconPoint = "api/Beacon";
-        /// <summary>
-        /// is used by the browser to send CSP violations for reporting
-        /// </summary>
-        public const string CSP = "api/CSP";
-        /// <summary>
-        /// Is integrated in the _layout.cshtml and is used to inject the FireWall scrip in to each page
-        /// </summary>
-        /// <remarks>You should have 3 references to this constant
-        /// 1. in the firewall configuration using:
-        ///    options.WebServices.IsUserApiUrl = new Uri(Links.IsUserEndpoint, UriKind.Relative);
-        ///    
-        /// 2. in the rout template of a controller using:
-        ///    [Route(Links.UserEndpointJavaScript)]
-        ///    
-        /// 3. in the _layout.cshtml linking the template to the FileResult using:
-        ///    <script src="@Url.Content(MVC_Core_31_Application.Links.UserEndpointJavaScript)"></script>
-        /// </remarks>
-        public const string UserEndpointJavaScript = "~/js/jquery.legasy.js";
-    }
-
-
-    class DBHelper
-    {
-
-        /// <summary>
-        /// Creates the databases.
-        /// </summary>
-        /// <param name="blank">if set to <c>true</c> [blank] databases will be use.</param>
-        /// <param name="configuration">The configuration to use.</param>
-        /// <param name="names">The connection string names to use.</param>
-        public static void CreateDatabases(bool blanq, IConfiguration configuration,params string[] names)
-        {
-            foreach (var name in names)
-            {
-                if (blanq)
-                {
-                    DropAndCreate(connectionString: configuration.GetConnectionString(name));
-                }
-                else
-                {
-                    MakeSureExists(connectionString: configuration.GetConnectionString(name));
-                }
-            }
-        }
-
-        private static void MakeSureExists(string connectionString)
-        {
-            var cb = new SqlConnectionStringBuilder(connectionString);
-            var databaseName = cb.InitialCatalog;
-            cb.InitialCatalog = "Master";
-            using (var conn = new SqlConnection(cb.ToString()))
-            {
-                conn.Open();
-
-                var cmd = new SqlCommand
-                {
-                    Connection = conn,
-                    CommandType= System.Data.CommandType.Text,
-                    CommandText = string.Format(@"
-IF NOT EXISTS(SELECT * FROM sys.databases WHERE name='{0}')
-BEGIN
-  DECLARE @FILENAME AS VARCHAR(255)
-  SET @FILENAME = CONVERT(VARCHAR(255), SERVERPROPERTY('instancedefaultdatapath')) + '{0}';
-  EXEC ('CREATE DATABASE [{0}] ON PRIMARY (NAME = [{0}], FILENAME =''' + @FILENAME + ''', SIZE = 25MB, MAXSIZE = 50MB, 	FILEGROWTH = 5MB )');
-END",
-                databaseName)
-                };
-
-                cmd.ExecuteNonQuery();
-            }
-        }
-        private static void DropAndCreate(string connectionString)
-        {
-            var cb = new SqlConnectionStringBuilder(connectionString);
-            var databaseName = cb.InitialCatalog;
-            cb.InitialCatalog = "Master";
-            using (var conn = new SqlConnection(cb.ToString()))
-            {
-                conn.Open();
-
-                var cmd = new SqlCommand
-                {
-                    Connection = conn,
-                    CommandType = System.Data.CommandType.Text,
-                    CommandText = string.Format(@"
-IF EXISTS(SELECT * FROM sys.databases WHERE name='{0}')
-	BEGIN
-		ALTER DATABASE [{0}]
-		SET SINGLE_USER
-		WITH ROLLBACK IMMEDIATE
-		DROP DATABASE [{0}]
-	END
-	DECLARE @FILENAME AS VARCHAR(255)
-	SET @FILENAME = CONVERT(VARCHAR(255), SERVERPROPERTY('instancedefaultdatapath')) + '{0}';
-	EXEC ('CREATE DATABASE [{0}] ON PRIMARY 
-		(NAME = [{0}], 
-		FILENAME =''' + @FILENAME + ''', 
-		SIZE = 25MB, 
-		MAXSIZE = 50MB, 
-		FILEGROWTH = 5MB )')",
-    databaseName)
-                };
-
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-    }
-
-
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            //this helper is used in the sample to create the databases if they do not exists
+            //in production you would normally not use this utility class or method.
             DBHelper.CreateDatabases(false, Configuration, "FireWallState", "FireWallMail");
         }
 
@@ -246,6 +116,11 @@ IF EXISTS(SELECT * FROM sys.databases WHERE name='{0}')
                 //tell the duration a malicious user is to be blocked
                 options.Rules.BlockRequest.BlockDuration.Expires = TimeSpan.FromMinutes(5);
                 options.Rules.BlockRequest.BlockDuration.SlideExpiration = true;
+
+                //you can set the log levels for incident detection as well as firewall guard actions
+                //manually. The namespace for the logger is at Walter.Web.FireWall.Guard 
+                options.Rules.IncidentLogLevel = LogLevel.Information;
+                options.Rules.GuardActionLogLevel = LogLevel.Warning;
 
                 //set the rules for browser based protection, the firewall can do without them but the extra layer of defense does not hurt
                 //having set the rules also helps the firewall understand your intend and help sniff-out bots that are violating the rules that
