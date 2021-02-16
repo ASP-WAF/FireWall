@@ -156,7 +156,8 @@ namespace MVC_Core_31_Application
                             Frequency = TimeSpan.FromDays(1),
                             Roles = EMailRoles.ProductUpdates | EMailRoles.OwnAccountRelatedViolations },
                         });
-                });
+                })
+                ;
 
             services.AddMvc(setupAction =>
             {
