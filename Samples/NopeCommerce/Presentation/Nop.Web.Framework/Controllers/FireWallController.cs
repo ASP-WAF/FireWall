@@ -16,11 +16,11 @@ namespace Nop.Web.Framework.Controllers
         private readonly ILogger<FireWallController> _logger;
         private readonly IFireWall _fireWall;
         private readonly IPageRequest _page;
-        public FireWallController(IFireWall fireWall,ILogger<FireWallController> logger=null)
+        public FireWallController(IFireWall fireWall,IPageRequest page, ILogger<FireWallController> logger=null)
         {
                 _logger = logger;
                 _fireWall = fireWall;
-               // _page = page;
+                _page = page;
             }
 
         [HttpGet]       
@@ -32,8 +32,14 @@ namespace Nop.Web.Framework.Controllers
 
             list.AppendLine($"Firewall version: {_fireWall.FirewallModuleVersion} status {_fireWall.State} license {_fireWall.License.LicenseKey.Domain.DomainUrl}: {_fireWall.License.LicenseKey.LicenseLevel}");
             list.AppendLine("---------------------------------------------------");
-            list.AppendLine(_fireWall.Report(ReportTypes.ALL));
-           
+            if (_page.User.IsAuthenticated)
+            {
+                list.AppendLine(_fireWall.Report(ReportTypes.ALL));
+            }
+            else
+            {
+                list.AppendLine(_fireWall.Report(ReportTypes.Details));
+            }
             list.AppendLine("---------------------------------------------------");
             return list.ToString();
         }

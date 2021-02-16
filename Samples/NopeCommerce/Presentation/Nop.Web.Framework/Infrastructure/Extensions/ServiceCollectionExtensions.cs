@@ -133,8 +133,8 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
 
 
             })//store firewall state in a database making the firewall faster and allow it for the firewall to maintain large data volumes
-                .UseDatabase(connectionString: configuration.GetConnectionString("fireWallStateNope"), schema: "dbo", dataRetention: TimeSpan.FromDays(90))
-                ;
+                .UseDatabase(connectionString: configuration.GetConnectionString("fireWallStateNope"), schema: "dbo", dataRetention: TimeSpan.FromDays(90));
+
             //create default file provider
             CommonHelper.DefaultFileProvider = new NopFileProvider(webHostEnvironment);
 
