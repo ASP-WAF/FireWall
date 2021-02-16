@@ -22,6 +22,7 @@ using Nop.Services.Vendors;
 
 namespace Nop.Web.Framework
 {
+
     /// <summary>
     /// Represents work context for web application
     /// </summary>

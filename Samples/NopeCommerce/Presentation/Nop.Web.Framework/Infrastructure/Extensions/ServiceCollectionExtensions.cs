@@ -1,4 +1,8 @@
-﻿using FluentValidation.AspNetCore;
+﻿using System;
+using System.Linq;
+using System.Net;
+using System.Reflection;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -6,8 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
 using Nop.Core;
 using Nop.Core.Configuration;
 using Nop.Core.Domain;
@@ -26,20 +35,16 @@ using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Framework.Security.Captcha;
 using Nop.Web.Framework.Themes;
 using StackExchange.Profiling.Storage;
-using System;
-using System.Linq;
-using System.Net;
-using System.Reflection;
+using Walter.Web.FireWall;
 using WebMarkupMin.AspNetCore3;
 using WebMarkupMin.NUglify;
-using Newtonsoft;
 
 namespace Nop.Web.Framework.Infrastructure.Extensions
 {
     /// <summary>
     /// Represents extensions of IServiceCollection
     /// </summary>
-    public static class ServiceCollectionExtensions
+    public static partial class ServiceCollectionExtensions
     {
         /// <summary>
         /// Add services to the application and configure service provider
@@ -63,14 +68,84 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
             //add accessor to HttpContext
             services.AddHttpContextAccessor();
 
+            DBHelper.CreateDatabases(false, configuration, "fireWallStateNope");
+
+            /* Use memory cashing to speed up the application
+                         *  you can use plugins like Redis or SQL backed cashing if you are using fail-over servers
+                         *  when using cashing the discovered ISP data of those that are attacking you will be re-used
+                         *  and do not have to be re-discovered on each request.
+                         */
+            services.AddMemoryCache();
+
+            /*Inject the firewall with a given configuration in your application
+             * You can use your own class and derive the firewall from that as a base class
+             *  then you can tune the configuration options to reflect your preferences
+             *  see online documentation for more information on the configuration options
+             *  at https://firewallapi.asp-waf.com/?topic=html/AllMembers.T-Walter.Web.FireWall.IFireWallConfig.htm
+             *  
+             *  The sample configuration can also be stored and loaded in json configuration, perhaps make the configuration
+             *  in code first and then save it as json to get started as the number of configuration options are abundant
+             */
+            services.AddFireWall<MyFireWall>(FireWallTrail.License, FireWallTrail.DomainKey
+                , new Uri("https://www.mydomain.com", UriKind.Absolute), options =>
+
+            {
+
+                //set your public IP address when debugging so you can simulate IP based protection     
+                //your real public IP address is accessible at  Walter.Net.Networking.RuntimeValues.PublicIpAddress 
+                options.PublicIpAddress = IPAddress.Parse("8.8.8.4");
+
+
+                options.Cypher.ApplicationPassword = "The password is 5 x 5, but I will not say in what order!";
+                options.UseSession = true;
+
+
+                //set the default security rule engines to reflect that you have a website and API requests for JavaScripts and monitoring
+                options.FireWallMode = FireWallProtectionModes.WebSiteWithApi;
+
+
+                //tell the duration a malicious user is to be blocked
+                options.Rules.BlockRequest.BlockDuration.Expires = TimeSpan.FromMinutes(5);
+                options.Rules.BlockRequest.BlockDuration.SlideExpiration = true;
+
+                //you can set the log levels for incident detection as well as firewall guard actions
+                //manually. The namespace for the logger is at Walter.Web.FireWall.Guard 
+                options.Rules.IncidentLogLevel = Microsoft.Extensions.Logging.LogLevel.Information;
+                options.Rules.GuardActionLogLevel = Microsoft.Extensions.Logging.LogLevel.Warning;
+
+
+                options.WebServices.IsUserApiUrl = new Uri(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.IsUserEndpoint, UriKind.Relative);
+                options.WebServices.RegisterLinksApiUrl = new Uri(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.SiteMapEndPoint, UriKind.Relative);
+                options.WebServices.BeaconApiUrl = new Uri(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.BeaconPoint, UriKind.Relative);
+                options.WebServices.CSPReportUrl = new Uri(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.CSPViolation, UriKind.Relative);
+
+                //set the rules for browser based protection, the firewall can do without them but the extra layer of defense does not hurt
+                //having set the rules also helps the firewall understand your intend and help sniff-out bots that are violating the rules that
+                //the browser would have detected and rejected. Header protection is "camouflage" as well as adds an active layer of protection
+                options.Rules.Headers.AddDefaultSecurePolicy()
+                                     .AddFrameOptionsDeny()
+                                     .AddStrictTransportSecurityNoCache()
+                                     .DoNotTrack()
+                                     .SimulateDifferentServer(Walter.Web.FireWall.Headers.ServerSimulation.Apache249Unix)
+                                     .SimulateDifferentTechnologyStack(Walter.Web.FireWall.Headers.StackSimulation.PHP)
+                                     .AddXssProtectionBlockAndReport(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.CSPViolation)
+                                     .AddContentSecurityPolicyTrustOnlySelf();
+
+
+            })//store firewall state in a database making the firewall faster and allow it for the firewall to maintain large data volumes
+                .UseDatabase(connectionString: configuration.GetConnectionString("fireWallStateNope"), schema: "dbo", dataRetention: TimeSpan.FromDays(90))
+                ;
             //create default file provider
             CommonHelper.DefaultFileProvider = new NopFileProvider(webHostEnvironment);
 
             //initialize plugins
-            var mvcCoreBuilder = services.AddMvcCore()
-                                         .AddApplicationPart(Assembly.GetAssembly(typeof(Walter.Web.FireWall.DefaultEndpoints.ReportingController)));
-
+            var mvcCoreBuilder = services.AddMvcCore();
             mvcCoreBuilder.PartManager.InitializePlugins(nopConfig);
+            
+            //add reporting endpoints for the firewall
+            mvcCoreBuilder.AddApplicationPart(Assembly.GetAssembly(typeof(Walter.Web.FireWall.DefaultEndpoints.ReportingController)));
+            mvcCoreBuilder.AddMvcOptions(options => options.Filters.Add<Walter.Web.FireWall.Filters.FireWallFilter>());
+
 
             //create engine and configure service provider
             var engine = EngineContext.Create();
@@ -183,24 +258,23 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
                     return redisConnectionWrapper.GetDatabase(nopConfig.RedisDatabaseId ?? (int)RedisDatabaseNumber.DataProtectionKeys);
                 }, NopDataProtectionDefaults.RedisDataProtectionKey);
             }
-            //else if (nopConfig.AzureBlobStorageEnabled && nopConfig.UseAzureBlobStorageToStoreDataProtectionKeys)
-            //{
-            //    var cloudStorageAccount = CloudStorageAccount.Parse(nopConfig.AzureBlobStorageConnectionString);
+            else if (nopConfig.AzureBlobStorageEnabled && nopConfig.UseAzureBlobStorageToStoreDataProtectionKeys)
+            {
+                var cloudStorageAccount = CloudStorageAccount.Parse(nopConfig.AzureBlobStorageConnectionString);
 
-            //    var client = cloudStorageAccount.CreateCloudBlobClient();
-            //    var container = client.GetContainerReference(nopConfig.AzureBlobStorageContainerNameForDataProtectionKeys);
+                var client = cloudStorageAccount.CreateCloudBlobClient();
+                var container = client.GetContainerReference(nopConfig.AzureBlobStorageContainerNameForDataProtectionKeys);
 
-            //    var dataProtectionBuilder = services.AddDataProtection()
-            //                                        .PersistKeysToAzureBlobStorage(container, NopDataProtectionDefaults.AzureDataProtectionKeyFile);
+                var dataProtectionBuilder = services.AddDataProtection().PersistKeysToAzureBlobStorage(container, NopDataProtectionDefaults.AzureDataProtectionKeyFile);
 
-            //    if (!nopConfig.EncryptDataProtectionKeysWithAzureKeyVault)
-            //        return;
+                if (!nopConfig.EncryptDataProtectionKeysWithAzureKeyVault)
+                    return;
 
-            //    var tokenProvider = new AzureServiceTokenProvider();
-            //    var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
+                var tokenProvider = new AzureServiceTokenProvider();
+                var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(tokenProvider.KeyVaultTokenCallback));
 
-            //    dataProtectionBuilder.ProtectKeysWithAzureKeyVault(keyVaultClient, nopConfig.AzureKeyVaultIdForDataProtectionKeys);
-            //}
+                dataProtectionBuilder.ProtectKeysWithAzureKeyVault(keyVaultClient, nopConfig.AzureKeyVaultIdForDataProtectionKeys);
+            }
             else
             {
                 var dataProtectionKeysPath = CommonHelper.DefaultFileProvider.MapPath(NopDataProtectionDefaults.DataProtectionKeysPath);
@@ -270,9 +344,8 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
         {
             //add basic MVC feature
             var mvcBuilder = services.AddControllersWithViews();
-            //mvcBuilder.AddNewtonsoftJson();
-            //mvcBuilder.AddRazorRuntimeCompilation();
 
+            mvcBuilder.AddRazorRuntimeCompilation();
 
             var nopConfig = services.BuildServiceProvider().GetRequiredService<NopConfig>();
             if (nopConfig.UseSessionStateTempDataProvider)
@@ -295,7 +368,8 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
 
             services.AddRazorPages();
 
-
+            //MVC now serializes JSON with camel case names by default, use this code to avoid it
+            mvcBuilder.AddNewtonsoftJson(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 
             //add custom display metadata provider
             mvcBuilder.AddMvcOptions(options => options.ModelMetadataDetailsProviders.Add(new NopMetadataProvider()));

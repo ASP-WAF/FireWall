@@ -30,7 +30,9 @@
     Html.AppendScriptParts(ResourceLocation.Footer, "~/lib/jquery-validate/jquery.validate.unobtrusive-v3.2.11/jquery.validate.unobtrusive.min.js");
     Html.AppendScriptParts(ResourceLocation.Footer, "~/lib/jquery-validate/jquery.validate-v1.19.1/jquery.validate.min.js");
     Html.AppendScriptParts(ResourceLocation.Footer, "~/lib/jquery/jquery-3.4.1.min.js");
-    
+
+    Html.AppendScriptParts(ResourceLocation.Footer, Url.Content(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.UserEndpointJavaScript));
+
     //custom tag(s);
     if (!string.IsNullOrEmpty(seoSettings.CustomHeadTags))
     {

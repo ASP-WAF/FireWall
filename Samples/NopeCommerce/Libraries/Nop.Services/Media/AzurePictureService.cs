@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Configuration;
@@ -13,9 +16,6 @@ using Nop.Services.Catalog;
 using Nop.Services.Configuration;
 using Nop.Services.Events;
 using Nop.Services.Seo;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Nop.Services.Media
 {
