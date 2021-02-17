@@ -1,7 +1,4 @@
-## Readme
-
-
-### ASP-WAF Application Firewall
+## ![](https://cdn.asp-waf.com/img/FireWall.png) ASP-WAF Application Firewall
 
 You have made a smart choice and have made a step to securing your web application from serious harm by using this firewall. 
 
@@ -65,7 +62,9 @@ Have a look at the various ways you can configure the firewall by :
  2. look at the full ASP-WAF framework API online by opening this link:
     https://firewallapi.asp-waf.com/ or download the API using compiled
     off-line help file found at https://www.asp-waf.com/download/ASP-WAF-FireWall.chm
-
+ 3. The sample implementation in the samples in this repository like
+   - [Simple MVC App](https://github.com/ASP-WAF/FireWall/blob/master/Samples/MVC_Core_31_Application/MVC_Core_31_Application/Startup.cs)
+   - [shopping card demo](https://github.com/ASP-WAF/FireWall/blob/master/Samples/NopeCommerce/Presentation/Nop.Web/Startup.cs) 
 For larger installations we recommend using database storage for the firewall state.
 
     services.AddFireWall( FireWallTrail.License
