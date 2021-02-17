@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Nop.Core.Configuration;
 
+vim: set syntax=java:
 namespace Nop.Core.Domain.Payments
 {
     /// <summary>
