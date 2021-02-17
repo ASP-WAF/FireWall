@@ -8,7 +8,7 @@ You have made a smart choice and have made a step to securing your web applicati
 There are 4 license levels available that have different functionality and allow the use of NuGet extension packages. 
 
 The license levels are:
-* ``COMMUNITY
+* COMMUNITY
 *This is free and helps to protect as well as report on the penetration and malicious intentions of your visitors.
 * BASE
 *A light-weight fully functional firewall that will do all the things you like a WAF to do and then some!
