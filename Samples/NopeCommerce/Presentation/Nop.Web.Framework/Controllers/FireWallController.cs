@@ -26,20 +26,15 @@ namespace Nop.Web.Framework.Controllers
         [HttpGet]       
         public string Get()
         {
-            _logger?.LogInformation("Get Health with admin protection from nope");
+            _logger?.LogInformation("Get Health");
 
             var list = new StringBuilder();
 
             list.AppendLine($"Firewall version: {_fireWall.FirewallModuleVersion} status {_fireWall.State} license {_fireWall.License.LicenseKey.Domain.DomainUrl}: {_fireWall.License.LicenseKey.LicenseLevel}");
             list.AppendLine("---------------------------------------------------");
-            if (_page.User.IsAuthenticated)
-            {
-                list.AppendLine(_fireWall.Report(ReportTypes.ALL));
-            }
-            else
-            {
-                list.AppendLine(_fireWall.Report(ReportTypes.Details));
-            }
+
+            list.AppendLine(_fireWall.Report(ReportTypes.ALL));
+
             list.AppendLine("---------------------------------------------------");
             return list.ToString();
         }

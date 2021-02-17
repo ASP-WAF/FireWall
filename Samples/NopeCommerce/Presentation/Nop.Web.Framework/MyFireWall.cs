@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Walter;
 using Walter.Web.FireWall;
+using Walter.Web.FireWall.Models;
 
 namespace Nop.Web.Framework
 {
@@ -60,11 +59,11 @@ namespace Nop.Web.Framework
                                          , e.Url.LocalPath
                                          );
             e.Allow = false;
-            //if (Debugger.IsAttached)
-            //{
-            //    //pause the application when debugged to allow you to use debugger to inspect state
-            //    Debugger.Break();
-            //}
+            if (Debugger.IsAttached)
+            {
+                //pause the application when debugged to allow you to use debugger to inspect state
+                Debugger.Break();
+            }
 
         }
 
@@ -82,16 +81,16 @@ namespace Nop.Web.Framework
                                          );
 
             //set create incident to true if the link does not exist, normally this would be a penetration attempt
-            e.CreateIncident = false;
+            //e.CreateIncident = false;
 
-            // e.CreateIncident = e.SiteMapSearch == SiteMapSearchResult.NotFound && e.Request.User.IsSearchEngine == SearchEngine.NotSure;
-            
+            e.CreateIncident = e.SiteMapSearch == SiteMapSearchResult.NotFound && e.Request.User.IsSearchEngine == SearchEngine.NotSure;
 
-            //if (Debugger.IsAttached)
-            //{
-            //    //pause the application when debugged to allow you to use debugger to inspect state
-            //    Debugger.Break();
-            //}
+
+            if (Debugger.IsAttached)
+            {
+                //pause the application when debugged to allow you to use debugger to inspect state
+                Debugger.Break();
+            }
         }
 
         private void MyFireWall_OnIncident(object sender, Walter.Web.FireWall.EventArguments.FireWallIncidentEventArgs e)
@@ -125,13 +124,13 @@ namespace Nop.Web.Framework
                 _logger?.Lazy().LogInformation(eventId: new EventId(Line(), Method()), message: "{Type}={Data}", entry.Key, entry.Value);
             }
 
-            e.AllowRaiseIncident = false;
+            e.AllowRaiseIncident = true;
 
-            //if (Debugger.IsAttached)
-            //{
-            //    //pause the application when debugged to allow you to use debugger to inspect state
-            //    Debugger.Break();
-            //}
+            if (Debugger.IsAttached)
+            {
+                //pause the application when debugged to allow you to use debugger to inspect state
+                Debugger.Break();
+            }
         }
 
         private void MyFireWall_OnCaughtExceptiont(object sender, Walter.Web.FireWall.EventArguments.ExceptionCaughtEventArgs e)
@@ -150,93 +149,5 @@ namespace Nop.Web.Framework
 
         internal static int Line([CallerLineNumber] int line = -1) => line;
         internal static string Method([CallerMemberName] string method = "") => method;
-    }
-
-    class DBHelper
-    {
-
-        /// <summary>
-        /// Creates the databases.
-        /// </summary>
-        /// <param name="blank">if set to <c>true</c> [blank] databases will be use.</param>
-        /// <param name="configuration">The configuration to use.</param>
-        /// <param name="names">The connection string names to use.</param>
-        public static void CreateDatabases(bool blank, IConfiguration configuration, params string[] names)
-        {
-            foreach (var name in names)
-            {
-                if (blank)
-                {
-                    DropAndCreate(connectionString: configuration.GetConnectionString(name));
-                }
-                else
-                {
-                    MakeSureExists(connectionString: configuration.GetConnectionString(name));
-                }
-            }
-        }
-
-        private static void MakeSureExists(string connectionString)
-        {
-            var cb = new SqlConnectionStringBuilder(connectionString);
-            var databaseName = cb.InitialCatalog;
-            cb.InitialCatalog = "Master";
-            using (var conn = new SqlConnection(cb.ToString()))
-            {
-                conn.Open();
-
-                var cmd = new SqlCommand
-                {
-                    Connection = conn,
-                    CommandType = System.Data.CommandType.Text,
-                    CommandText = string.Format(@"
-IF NOT EXISTS(SELECT * FROM sys.databases WHERE name='{0}')
-BEGIN
-  DECLARE @FILENAME AS VARCHAR(255)
-  SET @FILENAME = CONVERT(VARCHAR(255), SERVERPROPERTY('instancedefaultdatapath')) + '{0}';
-  EXEC ('CREATE DATABASE [{0}] ON PRIMARY (NAME = [{0}], FILENAME =''' + @FILENAME + ''', SIZE = 25MB, MAXSIZE = 50MB, 	FILEGROWTH = 5MB )');
-END",
-                databaseName)
-                };
-
-                cmd.ExecuteNonQuery();
-            }
-        }
-        private static void DropAndCreate(string connectionString)
-        {
-            var cb = new SqlConnectionStringBuilder(connectionString);
-            var databaseName = cb.InitialCatalog;
-            cb.InitialCatalog = "Master";
-            using (var conn = new SqlConnection(cb.ToString()))
-            {
-                conn.Open();
-
-                var cmd = new SqlCommand
-                {
-                    Connection = conn,
-                    CommandType = System.Data.CommandType.Text,
-                    CommandText = string.Format(@"
-IF EXISTS(SELECT * FROM sys.databases WHERE name='{0}')
-	BEGIN
-		ALTER DATABASE [{0}]
-		SET SINGLE_USER
-		WITH ROLLBACK IMMEDIATE
-		DROP DATABASE [{0}]
-	END
-	DECLARE @FILENAME AS VARCHAR(255)
-	SET @FILENAME = CONVERT(VARCHAR(255), SERVERPROPERTY('instancedefaultdatapath')) + '{0}';
-	EXEC ('CREATE DATABASE [{0}] ON PRIMARY 
-		(NAME = [{0}], 
-		FILENAME =''' + @FILENAME + ''', 
-		SIZE = 25MB, 
-		MAXSIZE = 50MB, 
-		FILEGROWTH = 5MB )')",
-    databaseName)
-                };
-
-                cmd.ExecuteNonQuery();
-            }
-        }
-
     }
 }
