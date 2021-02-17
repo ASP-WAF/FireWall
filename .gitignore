@@ -37,6 +37,8 @@ bld/
 #wwwroot/
 
 vim: syntax=java:
+vim: sytax=C++:
+
 # Visual Studio 2017 auto generated files
 Generated\ Files/
 
