@@ -3,22 +3,19 @@
 
 ### ASP-WAF Application Firewall
 
-
 You have made a smart choice and have made a step to securing your web application from serious harm by using this firewall. 
 
-There are 4 license levels available that have different functionality and allow the use of NuGet extension packages. The license levels are:
-*  COMMUNITY 
-This is free and helps to protect as well as report on the penetration and malicious intentions of your visitors.
-* BASE      
-A light-weight fully functional firewall that will do all the things you like a WAF to do and then some!
+There are 4 license levels available that have different functionality and allow the use of NuGet extension packages. 
 
-* SMB
-A firewall targeting small businesses that offer online shopping as well as the 
-            need to comply  with  GDPR privacy. This version allows you to use all extensions
-            and performs real-time reporting.
-
-* Enterprise
-A firewall that will integrate with the windows firewall extend protection to the whole server when malicious activity is detected as they will attack the whole server, not just the web application.
+The license levels are:
+* **COMMUNITY
+*This is free and helps to protect as well as report on the penetration and malicious intentions of your visitors.
+* **BASE
+*A light-weight fully functional firewall that will do all the things you like a WAF to do and then some!
+* **SMB
+*A firewall targeting small businesses that offer online shopping as well as the need to comply  with  GDPR privacy. This version allows you to use all extensions             and performs real-time reporting.
+* **Enterprise
+*A firewall that will integrate with the windows firewall extend protection to the whole server when malicious activity is detected as they will attack the whole server, not just the web application.
 
 
 ### GET STARTED
@@ -106,10 +103,11 @@ page & JavaScript:
 
 
 ### EXTENDING THE FIREWALL
+
 We did not ship you a black-box, you can extend and control the firewall using your on instance
 when you inherit from the Walter.Web.FireWall.FireWallBase class
 
-You then register your own base class by using the services.AddFireWall<T>() extension method
+You register your own base class by using the services.AddFireWall<T>() extension method
 
     services.AddFireWall<MyFireWall>(FireWallTrail.License
                         , FireWallTrail.DomainKey 
