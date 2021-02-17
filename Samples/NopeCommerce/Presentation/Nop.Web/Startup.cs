@@ -15,6 +15,15 @@ using Walter.Web.FireWall;
 
 namespace Nop.Web
 {
+    internal static class Links
+    {
+        public const string SiteMapEndPoint = "api/SiteMap";
+        public const string IsUserEndpoint = "api/UserDiscovery";
+        public const string BeaconPoint = "api/Beacon";
+        public const string CSP = "api/CSP";
+        public const string UserEndpointJavaScript = "js/jquery.legasy.js";
+    }
+
     /// <summary>
     /// Represents startup class of application
     /// </summary>
@@ -104,10 +113,10 @@ namespace Nop.Web
 
 
                 //we make use of the build-in Java script to detect and validate user and user interactions
-                options.WebServices.IsUserApiUrl = new Uri(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.IsUserEndpoint, UriKind.Relative);
-                options.WebServices.RegisterLinksApiUrl = new Uri(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.SiteMapEndPoint, UriKind.Relative);
-                options.WebServices.BeaconApiUrl = new Uri(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.BeaconPoint, UriKind.Relative);
-                options.WebServices.CSPReportUrl = new Uri(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.CSPViolation, UriKind.Relative);
+                options.WebServices.IsUserApiUrl = new Uri(Links.IsUserEndpoint, UriKind.Relative);
+                options.WebServices.RegisterLinksApiUrl = new Uri(Links.SiteMapEndPoint, UriKind.Relative);
+                options.WebServices.BeaconApiUrl = new Uri(Links.BeaconPoint, UriKind.Relative);
+                options.WebServices.CSPReportUrl = new Uri(Links.CSP, UriKind.Relative);
 
                 //set the rules for browser based protection, the firewall can do without them but the extra layer of defense does not hurt
                 //having set the rules also helps the firewall understand your intend and help sniff-out bots that are violating the rules that
