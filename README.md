@@ -63,8 +63,9 @@ Have a look at the various ways you can configure the firewall by :
     https://firewallapi.asp-waf.com/ or download the API using compiled
     off-line help file found at https://www.asp-waf.com/download/ASP-WAF-FireWall.chm
  3. The sample implementation in the samples in this repository like
-   - [Simple MVC App](https://github.com/ASP-WAF/FireWall/blob/master/Samples/MVC_Core_31_Application/MVC_Core_31_Application/Startup.cs)
-   - [shopping card demo](https://github.com/ASP-WAF/FireWall/blob/master/Samples/NopeCommerce/Presentation/Nop.Web/Startup.cs) 
+   - [Simple MVC App](https://github.com/ASP-WAF/FireWall/blob/master/Samples/MVC_Core_31_Application/MVC_Core_31_Application/Startup.cs) with a simple implementation
+   - [shopping card demo](https://github.com/ASP-WAF/FireWall/blob/master/Samples/NopeCommerce/Presentation/Nop.Web/Startup.cs) with an integration into a existing application
+
 For larger installations we recommend using database storage for the firewall state.
 
     services.AddFireWall( FireWallTrail.License
