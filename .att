@@ -1,4 +1,2 @@
-vim: set syntax=csharp:
+
 vim: set syntax=javascript:
-vim: set syntax=css:
-vim: set sytax=html:
