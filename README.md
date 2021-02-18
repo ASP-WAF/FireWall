@@ -24,6 +24,10 @@ We offer:
 3. WhatsApp via +352 661 464 601
 4. Live Share (send link request via mail or WhatsApp)
 
+#### Why reach out to us for support?
+Installation of Firewall packages need sometimes extra attention:  Firewall installation can block itself, there can be some desktop server communication issues, different hardware in same network reacts sometimes different than expected.
+
+
 ### GET STARTED
 
 Getting started is easy, have a look at the samples online at www.asp-waf.com but basically all you need to do is the two services configurations:
