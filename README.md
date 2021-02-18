@@ -16,7 +16,7 @@ A firewall that will integrate with the windows firewall extend protection to th
 
 ### SUPPORT
 
-Installation support is FREE for all license levels including trail usage.
+Installation support is FREE for all license levels including trial usage.
 We offer:
 
 1. Mail via support@asp-waf.com
@@ -37,8 +37,8 @@ Getting started is easy, have a look at the samples online at www.asp-waf.com bu
         //recommended feature (distributed memory cashing needs license)
         services.AddMemoryCache();
 
-        services.AddFireWall( FireWallTrail.License
-                        , FireWallTrail.DomainKey 
+        services.AddFireWall( FireWallTrial.License
+                        , FireWallTrial.DomainKey 
                         , domainName: new Uri("https://www.your-domain.dll", UriKind.Absolute), options =>
                         {
                            //set your options you need, there are several options like rules and reporting there are however 2 key properties 
@@ -81,8 +81,8 @@ Have a look at the various ways you can configure the firewall by :
 
 For larger installations we recommend using database storage for the firewall state.
 
-    services.AddFireWall( FireWallTrail.License
-                        , FireWallTrail.DomainKey 
+    services.AddFireWall( FireWallTrial.License
+                        , FireWallTrial.DomainKey 
                         , domainName: new Uri("https://www.your-domain.dll", UriKind.Absolute), options =>
                         {
                         //set your options
@@ -122,8 +122,8 @@ when you inherit from the Walter.Web.FireWall.FireWallBase class
 
 You register your own base class by using the services.AddFireWall<T>() extension method
 
-    services.AddFireWall<MyFireWall>(FireWallTrail.License
-                        , FireWallTrail.DomainKey 
+    services.AddFireWall<MyFireWall>(FireWallTrial.License
+                        , FireWallTrial.DomainKey 
                         , domainName: new Uri("https://www.your-domain.dll", UriKind.Absolute), options =>
                         {
                         //set your options
@@ -138,8 +138,8 @@ You can make sure that you never leak any private data when using the Walter.Web
 The cookie store will store the data on your server and only set's the "empty" cookie in the clients 
 browser. 
 
-    services.AddFireWall( FireWallTrail.License
-                        , FireWallTrail.DomainKey 
+    services.AddFireWall( FireWallTrial.License
+                        , FireWallTrial.DomainKey 
                         , domainName: new Uri("https://www.your-domain.dll", UriKind.Absolute), options =>
                         {
                         //set your options
@@ -209,8 +209,8 @@ public async Task<IActionResult> Index()
 The firewall, if not configured, will store data to disk. You can use a database by updating the configuration or
 setting the database explicitly
 
-    services.AddFireWall( FireWallTrail.License
-                        , FireWallTrail.DomainKey 
+    services.AddFireWall( FireWallTrial.License
+                        , FireWallTrial.DomainKey 
                         , domainName: new Uri("https://www.your-domain.dll", UriKind.Absolute), options =>
                         {
                            //set your options
@@ -230,10 +230,10 @@ setting the database explicitly
 https://firewallapi.asp-waf.com/?topic=html/M-Microsoft.Extensions.DependencyInjection.FireWallBuilderExtensions.UseUserAgentDBStore--1_1.htm
 
 ### LICENSE
-You can try the firewall using the trail keys or register your own version today go and get your own license at https://www.asp-waf.com and register your copy today.
+You can try the firewall using the trial keys or register your own version today go and get your own license at https://www.asp-waf.com and register your copy today.
 
 ### DATA EXCHANGE
-Users with a license level of Trail, Community or Base may exchange known malicious user activity
+Users with a license level of Trial, Community or Base may exchange known malicious user activity
 with the subscription server. If you do not wish to participate with the data improvement program
 you will need to get a Small business or enterprise license
 
