@@ -14,6 +14,15 @@ A firewall targeting small businesses that offer online shopping as well as the 
 * ENTERPRICE
 A firewall that will integrate with the windows firewall extend protection to the whole server when malicious activity is detected as they will attack the whole server, not just the web application.
 
+### SUPPORT
+
+Installation support is free for all license levels including trail usage.
+We offer:
+
+1. Mail via support@asp-waf.com
+2. Phone via +352 661 464 601, +352 661 464 633
+3. WhatsApp via +352 661 464 601
+4. Live Share (send link request via mail or WhatsApp)
 
 ### GET STARTED
 
