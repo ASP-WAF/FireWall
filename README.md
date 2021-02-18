@@ -16,7 +16,7 @@ A firewall that will integrate with the windows firewall extend protection to th
 
 ### SUPPORT
 
-Installation support is free for all license levels including trail usage.
+Installation support is FREE for all license levels including trail usage.
 We offer:
 
 1. Mail via support@asp-waf.com
