@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Nop.Core.Configuration;
 
-vim: set syntax=javascript:
+
 namespace Nop.Core.Domain.Payments
 {
     /// <summary>

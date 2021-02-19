@@ -12,14 +12,20 @@ using Nop.Web.Framework.Infrastructure.Extensions;
 using System;
 using System.Net;
 using Walter.Web.FireWall;
+using Walter.Web.FireWall.Filters;
 
 namespace Nop.Web
 {
-    internal static class Links
+    /// <summary>
+    /// if any other plugin uses the same routs as the firewall then you just change these
+    /// constance values and the configuration will adapt ensuring the firewall will work
+    /// as expected
+    /// </summary>
+    public static class Links
     {
-        public const string SiteMapEndPoint = "api/SiteMap";
+        public const string SiteMapEndPoint = "api/SiteMapPageRequest";
         public const string IsUserEndpoint = "api/UserDiscovery";
-        public const string BeaconPoint = "api/Beacon";
+        public const string BeaconPoint = "api/BeaconPageRequest";
         public const string CSP = "api/CSP";
         public const string UserEndpointJavaScript = "js/jquery.legasy.js";
     }
@@ -56,6 +62,16 @@ namespace Nop.Web
         /// <param name="services">Collection of service descriptors</param>
         public void ConfigureServices(IServiceCollection services)
         {
+
+            // update method and inject core firewall filter in the MVC project
+            // change :
+            //   var mvcCoreBuilder = services.AddMvcCore();
+            //
+            // To:
+            //   var mvcCoreBuilder = services.AddMvcCore(setupAction=> {
+            //          setupAction.Filters.Add<Walter.Web.FireWall.Filters.FireWallFilter>(0);
+            //       }); 
+
             (_engine, _nopConfig) = services.ConfigureApplicationServices(_configuration, _webHostEnvironment);
 
 
@@ -76,8 +92,8 @@ namespace Nop.Web
              *  The sample configuration can also be stored and loaded in json configuration, perhaps make the configuration
              *  in code first and then save it as json to get started as the number of configuration options are abundant
              */
-            services.AddFireWall<MyFireWall>(FireWallTrail.License, FireWallTrail.DomainKey
-                , new Uri("https://www.mydomain.com", UriKind.Absolute), options =>
+            services.AddFireWall<MyFireWall>(license: FireWallTrial.License,domainLicense: FireWallTrial.DomainKey
+                ,domainName: new Uri("https://www.mydomain.com", UriKind.Absolute), options =>
 
             {
 
@@ -127,13 +143,39 @@ namespace Nop.Web
                                      .DoNotTrack()
                                      .SimulateDifferentServer(Walter.Web.FireWall.Headers.ServerSimulation.Apache249Unix)
                                      .SimulateDifferentTechnologyStack(Walter.Web.FireWall.Headers.StackSimulation.PHP)
-                                     .AddXssProtectionBlockAndReport(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.CSPViolation)
+                                     .AddXssProtectionBlockAndReport(Links.CSP)
                                      .AddContentSecurityPolicyTrustOnlySelf();
+
+                options.OnEndpointsCreated += Options_OnEndpointsCreated;
 
 
             })//store firewall state in a database making the firewall faster and allow it for the firewall to maintain large data volumes
                 .UseDatabase(connectionString: _configuration.GetConnectionString("fireWallStateNope"), schema: "dbo", dataRetention: TimeSpan.FromDays(90));
 
+        }
+
+        /// <summary>
+        /// When Endpoints have been discovered
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Options_OnEndpointsCreated(object sender, Walter.Web.FireWall.EventArguments.EndpointsCreatedEventArgs e)
+        {
+
+            var data = e.Links.EndpointsInPath("*.zip", "*.pdf");
+            foreach (var item in data)
+            {
+                item.AddHock = null;
+                //allow external sites to access documents as well as download links
+                item.NoValidate |= FireWallGuardModules.RejectAddHockRequests | FireWallGuardModules.RejectCrossSiteRequests;
+            }
+            data = e.Links.EndpointsInPath("*.css", "*.png", "*.jpg", "*.js");
+            foreach (var item in data)
+            {
+                //disable the firewall on all items that match the above filter, 
+                item.NoValidate = FireWallGuardModules.ALL;
+                item.FirewallDisabled = true;
+            }
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

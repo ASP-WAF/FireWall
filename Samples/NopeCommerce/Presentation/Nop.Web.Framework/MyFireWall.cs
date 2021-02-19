@@ -29,6 +29,7 @@ namespace Nop.Web.Framework
             base.OnGuardAction += MyFireWall_OnGuardAction;
 
             base.Trigger_OnFireWallCreated(this);
+
         }
 
         private void MyFireWall_OnGuardAction(object sender, Walter.Web.FireWall.EventArguments.GuardActionEventArgs e)

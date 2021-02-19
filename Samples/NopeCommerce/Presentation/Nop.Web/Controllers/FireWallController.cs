@@ -84,7 +84,7 @@ namespace Nop.Web.Controllers
                 }
                 else
                 {
-                    _logger?.LogError("ValidateUser javascript generation failed for {Page}", _page.ToString());
+                    _logger?.LogError("ValidateUser javascript generation failed for {Page}", _page.SessionPageGroupNumber);
                     javaScript = UTF8Encoding.UTF8.GetBytes($"console.log('could not generate userValidation')");
                     return File(fileContents: javaScript, contentType: "text/javascript");
                 }

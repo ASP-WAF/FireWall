@@ -73,14 +73,13 @@ namespace Nop.Web.Framework.Infrastructure.Extensions
             CommonHelper.DefaultFileProvider = new NopFileProvider(webHostEnvironment);
 
             //initialize plugins
-            var mvcCoreBuilder = services.AddMvcCore();
+            var mvcCoreBuilder = services.AddMvcCore(setupAction=> {
+                //ensure the firewall is protecting each request
+                setupAction.Filters.Add<Walter.Web.FireWall.Filters.FireWallFilter>(0);
+            });
             mvcCoreBuilder.PartManager.InitializePlugins(nopConfig);
             
-            //add reporting endpoints for the firewall
-            mvcCoreBuilder.AddApplicationPart(Assembly.GetAssembly(typeof(Walter.Web.FireWall.DefaultEndpoints.ReportingController)));
-            mvcCoreBuilder.AddMvcOptions(options => options.Filters.Add<Walter.Web.FireWall.Filters.FireWallFilter>());
-
-
+            
             //create engine and configure service provider
             var engine = EngineContext.Create();
 
