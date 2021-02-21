@@ -10,10 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Walter.Web.Firewall" Version="2021.2.16.1" />
-    <PackageReference Include="Walter.Web.FireWall.Geo.MaxMind" Version="2021.2.16.1" />
-    <PackageReference Include="Walter.Web.FireWall.Geo.Native" Version="2021.2.16.1" />
-    <PackageReference Include="Walter.Web.FireWall.SMTPLogger" Version="2021.2.16.1" />
+    <PackageReference Include="Walter.Web.Firewall" Version="2021.2.20.1" />
   </ItemGroup>
 
 </Project>

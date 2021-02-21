@@ -90,21 +90,17 @@ namespace MVC_Core_31_Application
              *  The sample configuration can also be stored and loaded in json configuration, perhaps make the configuration
              *  in code first and then save it as json to get started as the number of configuration options are abundant
              */
-            services.AddFireWall<MyFireWall>(FireWallTrail.License, FireWallTrail.DomainKey, new Uri("https://www.mydomain.com", UriKind.Absolute), options =>
+            services.AddFireWall<MyFireWall>(FireWallTrial.License, FireWallTrial.DomainKey, new Uri("https://www.mydomain.com", UriKind.Absolute), options =>
 
             {
-               
-                //set your public IP address when debugging so you can simulate IP based protection     
-                //your real public IP address is accessible at  Walter.Net.Networking.RuntimeValues.PublicIpAddress 
-                options.PublicIpAddress = IPAddress.Parse("8.8.8.4");
 
-        
+
                 options.Cypher.ApplicationPassword = "The password is 5 x 5, but I will not say in what order!";
                 options.UseSession = true;
 
 
                 //set the default security rule engines to reflect that you have a website and API requests for JavaScripts and monitoring
-                options.FireWallMode =FireWallProtectionModes.WebSiteWithApi;
+                options.FireWallMode = FireWallProtectionModes.WebSiteWithApi;
 
                 //configure the firewall endpoints used when user discovery is used for web applications that support JavaScript
                 options.WebServices.IsUserApiUrl = new Uri(Links.IsUserEndpoint, UriKind.Relative);
@@ -136,36 +132,20 @@ namespace MVC_Core_31_Application
 
 
             })//store firewall state in a database making the firewall faster and allow it for the firewall to maintain large data volumes
-                .UseDatabase(connectionString: Configuration.GetConnectionString("FireWallState"), schema: "dbo", dataRetention: TimeSpan.FromDays(90))
-              //use different delta for email frequency where the firewall will collect and bundle incidents and issues in a single mail
-                .UseSMTPReportingDatabase(connectionString: Configuration.GetConnectionString("FireWallMail"), options =>
-                {
-                    options.Archive = TimeSpan.FromDays(365);
-                    options.Server = "mail.mydomain.com";
-                    options.UserName = "noreply@mydomain.com";
-                    options.Password = "SmtP-pa$$w0rd-1234";
-                    options.Port = 25;
-                    options.From = "noreply@your-domain.com";
-                    options.IgnoreServerCertificateErrors = true;
-                    options.DefaultEmail = "webmaster@mydomain.com";
-                    options.MailingList.AddRange(new[] {
-                        new EMailAddress(displayName:"Security Administrators", address:"security@mydomain.com") {
-                            Frequency = TimeSpan.FromHours(1),
-                            Roles = EMailRoles.FireWallAdministrationViolations | EMailRoles.UnauthorizedPhysicalFilesViolation },
-                        new EMailAddress(displayName:"Application developers", address:"info@mydomain.com") {
-                            Frequency = TimeSpan.FromDays(1),
-                            Roles = EMailRoles.ProductUpdates | EMailRoles.OwnAccountRelatedViolations },
-                        });
-                })
-                ;
+                .UseDatabase(connectionString: Configuration.GetConnectionString("FireWallState"), schema: "dbo", dataRetention: TimeSpan.FromDays(90));
 
+            //configure the firewall to be active on each request by registering the firewall filter
             services.AddMvc(setupAction =>
             {
                 //enable the firewall on all endpoints in this application 
                 setupAction.Filters.Add<Walter.Web.FireWall.Filters.FireWallFilter>();
-                //inform the browser of our privacy policy
+                //inform the browser of our privacy policy if you render views
+                
                 setupAction.Filters.Add<Walter.Web.FireWall.Filters.PrivacyPreferencesFilter>();
+                //view the filter documentation at https://firewallapi.asp-waf.com/?topic=html/N-Walter.Web.FireWall.Filters.htm
+
             });
+
             services.AddControllersWithViews();
         }
 

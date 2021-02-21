@@ -68,7 +68,6 @@
              <li class="breadcrumb-item active"><a href="@request.BreadCrumbs[i].GetRelativeUrl(request)">@request.BreadCrumbs[i]</a></li>
           }
       }
-
   </ol>
                 </nav>
     <div class="container">
@@ -88,7 +87,6 @@
 
     @*Inject firewall user discovery script in the view template*@
     <script src="@Url.Content(MVC_Core_31_Application.Links.UserEndpointJavaScript)"></script>
-
     @*
         if you use NuGet package Walter.Web.FireWall.DefaultEndpoints then use:
         <script src="@Url.Content(Walter.Web.FireWall.DefaultEndpoints.DefaultLinks.UserEndpointJavaScript)"></script>

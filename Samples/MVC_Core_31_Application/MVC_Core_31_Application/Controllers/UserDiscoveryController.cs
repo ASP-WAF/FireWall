@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Walter;
 using Walter.BOM.ErrorCodes;
 using Walter.Net.Networking;
@@ -32,8 +30,8 @@ namespace MVC_Core_31_Application.Controllers
             _fireWall = fireWall;
             _page = page;
         }
-        
-        
+
+
         /// <summary>
         /// an API endpoint that can be called from an API endpoint and is protected using the firewall rule-set for 
         /// API Endpoints
@@ -61,10 +59,10 @@ namespace MVC_Core_31_Application.Controllers
                 list.AppendLine(_fireWall.Report(ReportTypes.ALL));
             }
             else
-            { 
+            {
                 list.AppendLine(_fireWall.Report(ReportTypes.Activity | ReportTypes.KPI));
             }
-            
+
 
             if (!(_page.Exception is null))
             {
@@ -91,10 +89,10 @@ namespace MVC_Core_31_Application.Controllers
         public IActionResult CSP(CSPModel model)
         {
             //lazy logging does not slow down the application as it is queued for later processing or ignored if A log level is not enabled
-            _logger.Lazy().LogCritical(new EventId(1001,"Developer related issue")
+            _logger.Lazy().LogCritical(new EventId(1001, "Developer related issue")
                                       , "CSP Violation reported by {agent} on {path} on line {line}"
                                       , _page.User.UserAgent, model.BlockedUri, model.LineNumber);
-            
+
             // record CSP violations reported by the browser and send it to all documentation interfaces including the email reporting used
             // by the sample
             var csp = new ContentSecurityPolicyViolation(_page, model);
