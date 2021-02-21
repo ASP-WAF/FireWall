@@ -7,7 +7,7 @@ namespace Nop.Web.Framework
     {
 
         /// <summary>
-        /// Creates the databases.
+        /// Creates the databases for the Nope demo application.
         /// </summary>
         /// <param name="blank">if set to <c>true</c> [blank] databases will be use.</param>
         /// <param name="configuration">The configuration to use.</param>
