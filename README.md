@@ -223,8 +223,8 @@ setting the database explicitly
         options.Filters.Add<Walter.Web.FireWall.Filters.FireWallFilter>();
     });
 ````
-    More information and samples can be found at
-https://firewallapi.asp-waf.com/?topic=html/M-Microsoft.Extensions.DependencyInjection.FireWallBuilderExtensions.UseUserAgentDBStore--1_1.htm
+More information and samples can be found at [UserAgentDBStore]( 
+https://firewallapi.asp-waf.com/?topic=html/M-Microsoft.Extensions.DependencyInjection.FireWallBuilderExtensions.UseUserAgentDBStore--1_1.htm)
 
 ### LICENSE
 You can try the firewall using the trial keys or register your own version today go and get your own license at https://www.asp-waf.com and register your copy today.
