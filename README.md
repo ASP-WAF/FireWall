@@ -32,7 +32,7 @@ Have a look at the various ways you can configure the firewall by :
  2. look at the full ASP-WAF framework API online by opening this link:
     https://firewallapi.asp-waf.com/ or download the API using compiled
     off-line help file found at https://www.asp-waf.com/download/ASP-WAF-FireWall.chm
- 3. The sample implementation in the samples in this repository like
+ 3. The sample implementation in this samples in this GitHub repository like
    - [Simple MVC App](https://github.com/ASP-WAF/FireWall/blob/master/Samples/MVC_Core_31_Application/MVC_Core_31_Application/Startup.cs) with a simple implementation
    - [Nope Shopping card demo](https://github.com/ASP-WAF/FireWall/tree/master/Samples/NopeCommerce) with an integration into a existing application
 
