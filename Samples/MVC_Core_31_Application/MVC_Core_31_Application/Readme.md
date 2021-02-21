@@ -95,7 +95,7 @@ The sample assumes that you create your own user discovery controller and not us
     @*
 ```  
 
-As you do not use the [Walter.Web.FireWall.DefaultEndpoints](https://www.nuget.org/packages/Walter.Web.FireWall.DefaultEndpoints/) NuGet Package this sample shows how to feed the User discovery data back to the firewall in the [Controllers\UserDiscoveryController.cs file](https://github.com/ASP-WAF/FireWall/blob/master/Samples/MVC_Core_31_Application/MVC_Core_31_Application/Controllers/UserDiscoveryController.cs.
+As you do not use the [Walter.Web.FireWall.DefaultEndpoints](https://www.nuget.org/packages/Walter.Web.FireWall.DefaultEndpoints/) NuGet Package this sample shows how to feed the User discovery data back to the firewall in the [Controllers\UserDiscoveryController.cs file](https://github.com/ASP-WAF/FireWall/blob/master/Samples/MVC_Core_31_Application/MVC_Core_31_Application/Controllers/UserDiscoveryController.cs).
 
 
 
