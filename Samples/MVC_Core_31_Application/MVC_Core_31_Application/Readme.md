@@ -101,7 +101,7 @@ As you do not use the [Walter.Web.FireWall.DefaultEndpoints](https://www.nuget.o
 
 ## Test the implementation
 You can query the firewall state as well as monitor the health by using the build-in API as shown in the bellow sample. 
-The URL to the project would be ~/API/Reporting/Text and is defined in the The URL to the project would be ~/API/Reporting/Text and is defined in the The URL to the project would be ~/API/Reporting/Text and is defined in the Controllers\UserDiscoveryController.cs file
+The URL to the project would be ~/API/Reporting/Text and is defined in the previousely mentioned [Controllers\UserDiscoveryController.cs](https://github.com/ASP-WAF/FireWall/blob/master/Samples/MVC_Core_31_Application/MVC_Core_31_Application/Controllers/UserDiscoveryController.cs) file
 
 
 
