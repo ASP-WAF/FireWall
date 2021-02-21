@@ -63,10 +63,6 @@
     <Folder Include="Plugins\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Walter" Version="2021.2.19.2" />
-  </ItemGroup>
-
   <!-- This target execute after "Build" target.
     We use it to clean up folder with plugins from unnecessary and obsolete libraries. -->
   <Target Name="NopTarget" AfterTargets="Build">
