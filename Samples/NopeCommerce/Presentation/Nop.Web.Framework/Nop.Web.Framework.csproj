@@ -16,7 +16,7 @@
   <ItemGroup>
     <PackageReference Include="BundlerMinifier.Core" Version="3.2.447" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
-    <PackageReference Include="Walter.Web.FireWall" Version="2021.2.20.1" />
+    <PackageReference Include="Walter.Web.FireWall" Version="2021.3.1.12" />
     <PackageReference Include="WebMarkupMin.AspNetCore3" Version="2.8.2" />
     <PackageReference Include="WebMarkupMin.NUglify" Version="2.8.1" />
   </ItemGroup>

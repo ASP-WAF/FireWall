@@ -1,0 +1,20 @@
+﻿@model Walter.Net.Networking.IWhois
+@inject Walter.Web.FireWall.IPageRequest page
+@{
+    ViewData["Title"] = "Home Page - IWhois viewer";
+}
+
+<div class="text-center" firewall-userTypes-is-Malicious="true", firewall-userTypes-is-bot="true">
+    <h1 class="display-4">You are not welcome here</h1>
+    <p>
+        We have evaluated your activity and refuse to show this page
+    </p>
+</div>
+<div class="text-center" firewall-userTypes-is-Malicious="false", firewall-userTypes-is-bot="false">
+
+    @Html.BeginForm(antiforgery:true)
+    {
+        
+    }
+
+</div>

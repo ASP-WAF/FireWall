@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Walter;
 using Walter.Web.FireWall;
+using Walter.Web.FireWall.EventArguments;
 using Walter.Web.FireWall.Models;
 
 namespace Nop.Web.Framework
@@ -27,7 +28,7 @@ namespace Nop.Web.Framework
             base.OnPhishyRequest += MyFireWall_OnPhishyRequest;
             base.OnUserTypeChange += MyFireWall_OnUserTypeChange;
             base.OnGuardAction += MyFireWall_OnGuardAction;
-
+            base.OnCookiePoisoningIncident += MyFireWall_OnCookiePoisoningIncident;
             base.Trigger_OnFireWallCreated(this);
 
         }
@@ -59,7 +60,7 @@ namespace Nop.Web.Framework
                                          , e.NewType
                                          , e.Url.LocalPath
                                          );
-            e.Allow = false;
+            e.Allow = true;
             if (Debugger.IsAttached)
             {
                 //pause the application when debugged to allow you to use debugger to inspect state
@@ -91,6 +92,72 @@ namespace Nop.Web.Framework
             {
                 //pause the application when debugged to allow you to use debugger to inspect state
                 Debugger.Break();
+            }
+        }
+
+        /// <summary>
+        /// If this creates a incident the firewall will queue the incident in the reporting workflows, if
+        /// the email workflow is enabled an email to the firewall administrators will be send informing them about the incident 
+        /// </summary>
+        private void MyFireWall_OnCookiePoisoningIncident(object sender, FireWallCookieIncidentEventArgs e)
+        {
+            /* create a incident and block all access based on the firewall rules for cookie poisoning
+            * you can not create an incident based on your own logic here
+            * like:  
+             
+             e.AllowRaiseIncident = e.CookiePoisoning.CookieManipulations > 2;           
+
+            * or when a non- served cookie was injected by checking for common attack patterns like "userId", "card" or "admin"
+              e.AllowRaiseIncident =  e.CookiePoisoning.PhishingForCookies.ContainsKey("admin");
+            *
+            * or when the firewall knows the user is a bot, but not a search engine
+              e.AllowRaiseIncident = user.UserType.HasFlag(UserTypes.IsBot) && !user.UserType.HasFlag(UserTypes.IsSearchEngine);
+            */
+
+
+            if (Debugger.IsAttached)
+            {
+                //pause the application when debugged to allow you to use debugger to inspect state
+                Debugger.Break();
+            }
+            var user = e.Page.User.AsFirewallUser();
+            e.AllowRaiseIncident = user.UserType.HasFlag(UserTypes.IsBot) && !user.UserType.HasFlag(UserTypes.IsSearchEngine);
+
+
+            //what ever the firewall detected the user was, add the fact that the user is malicious
+            user.UserType |= UserTypes.IsMalicious;
+
+
+
+            //you can do this in the logger but as we are going to block the response making it a ms slower will not "harm user experience"
+            var InterNetProviderAbuseContact = e.Page.GetAbuseContact();
+            var ipAddressFromCountry = Walter.BOM.Geo.GeoLocationMapping.GetCountryName(e.Page.Country ?? InterNetProviderAbuseContact.Country);
+
+            //loop over all poisoned cookies and log them
+            foreach (var cookie in e.PoisonedCookies)
+            {
+                if (e.Page.User.IsSearchEngine == SearchEngine.NotSure)
+                {
+                    _logger.LogWarning("Cookie {name} was poisoned with {value} when {original} was send to by {IP} via {ISP_Name} contact {ISP_Email} in {country}"
+                        , cookie.Name
+                        , cookie.PoisonedValue
+                        , cookie.OriginalValue
+                        , user.IPAddress
+                        , InterNetProviderAbuseContact.Name
+                        , InterNetProviderAbuseContact.EMail
+                        , ipAddressFromCountry
+                        );
+                }
+                else
+                {
+                    _logger.LogWarning("Cookie {name} was poisoned with {value} when {original} was send to site by search engine {searchEngine}"
+                        , cookie.Name
+                        , cookie.PoisonedValue
+                        , cookie.OriginalValue
+                        , e.Page.User.IsSearchEngine
+                        );
+                }
+
             }
         }
 

@@ -1,0 +1,17 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information",
+      "Walter": "Error",
+    }
+  },
+  //firewall storage database, use a connection string that makes sense in your hosting, the bellow string uses a localdb instance that is not supported with most ISP's
+  "ConnectionStrings": {
+    "Test1": "Server=(localdb)\\mssqllocaldb;Initial Catalog=Test1;Trusted_Connection=Yes;",
+    "Test2": "Server=(localdb)\\mssqllocaldb;Initial Catalog=Test2;Trusted_Connection=Yes;",
+    "Test3": "Server=(localdb)\\mssqllocaldb;Initial Catalog=Test3;Trusted_Connection=Yes;"
+  },
+  "AllowedHosts": "*"
+}
