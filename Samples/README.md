@@ -6,4 +6,5 @@ Here you will find some samples that demonstrate the firewall integration in sev
  [MVC_Core_3.1 Application](https://github.com/ASP-WAF/FireWall/tree/master/Samples/MVC_Core_31_Application/MVC_Core_31_Application) folder
 
 - The Nope shopping card sample shows how to integrate the firewall in a real application used by thousands of companies by inspecting the code in the [Nope Commerce](https://github.com/ASP-WAF/FireWall/tree/master/Samples/NopeCommerce) folder. 
+- IMplemending a extension method for the firewall using IP2Location web API [GEO Sample](https://github.com/ASP-WAF/FireWall/tree/master/Samples/IGeoFactory%20implementation)
 
