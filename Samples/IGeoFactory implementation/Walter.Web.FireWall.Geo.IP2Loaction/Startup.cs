@@ -53,6 +53,10 @@ namespace Walter.Web.FireWall.Geo.IP2Loaction
             services.AddMemoryCache();
             services.AddAntiforgery();
 
+            //register the custom IGeoFactory registration for the firewall to make use of
+            services.AddSingleton<IGeoFactory, IP2LocationGeoFactory>();
+
+            //register the firewall by injecting it 
             services.AddFireWall<MyFireWall>(FireWallTrial.License, FireWallTrial.DomainKey
                 , domainName: new Uri("https://TrailDomain.com", UriKind.Absolute), options =>
                {
