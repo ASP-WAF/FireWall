@@ -34,7 +34,7 @@ Have a look at the various ways you can configure the firewall by :
     off-line help file found at https://www.asp-waf.com/download/ASP-WAF-FireWall.chm
  3. The sample implementation in this samples in this GitHub repository like
    [Simple MVC App](https://github.com/ASP-WAF/FireWall/blob/master/Samples/MVC_Core_31_Application/MVC_Core_31_Application/Startup.cs) with a simple implementation
-   [Nope Shopping card demo](https://github.com/ASP-WAF/FireWall/tree/master/Samples/NopeCommerce) with an integration into a existing application
+   [Nope Shopping card demo](https://github.com/ASP-WAF/FireWall/tree/master/Samples/NopeCommerce) with an integration into a existing application as well as extending the firewall with this [GEO Sample](https://github.com/ASP-WAF/FireWall/tree/master/Samples/IGeoFactory%20implementation)
 
 Getting started is easy, have a look at the samples online at www.asp-waf.com but basically all you need to do is the two services configurations:
 ````C#    
