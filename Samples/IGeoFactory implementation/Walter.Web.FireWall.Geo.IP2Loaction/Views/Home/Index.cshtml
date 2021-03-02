@@ -1,5 +1,6 @@
-﻿@model Walter.Net.Networking.IWhois
-@inject Walter.Web.FireWall.IPageRequest page
+﻿@model Walter.Web.FireWall.Geo.IP2Loaction.Models.WhoisQuery
+@inject Walter.Web.FireWall.IPageRequest _page
+
 @{
     ViewData["Title"] = "Home Page - IWhois viewer";
 }
@@ -10,11 +11,8 @@
         We have evaluated your activity and refuse to show this page
     </p>
 </div>
+
 <div class="text-center" firewall-userTypes-is-Malicious="false", firewall-userTypes-is-bot="false">
-
-    @Html.BeginForm(antiforgery:true)
-    {
-        
-    }
-
+      @await Html.PartialAsync("_whois", Model)
 </div>
+

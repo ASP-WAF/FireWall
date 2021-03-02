@@ -1,15 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Walter.BOM.Geo;
 using Walter.Web.FireWall.Geo.IP2Loaction.Infrastructure;
 
@@ -84,7 +80,7 @@ namespace Walter.Web.FireWall.Geo.IP2Loaction
                    options.ContactDetails.Phone = "+123 123 456 789";
                    options.ContactDetails.Country = GeoLocation.Andorra;
 
-    
+
                    options.Rules.AllowWhiteListing = true;
                    options.Rules.PhysicalFileWallExcludeReasons = Walter.BOM.FirewallBlockReasons.ALL & ~Walter.BOM.FirewallBlockReasons.NoAccessFromRegion;
                    options.Rules.BlockRequest.BlockDuration.SlideExpiration = true;
@@ -93,7 +89,7 @@ namespace Walter.Web.FireWall.Geo.IP2Loaction
                    //allow access to resources from internal and trusted external website
                    options.Rules.AddTrustedCrossSiteDomains(new Uri("https://wwwGithub.com", UriKind.Absolute)
                                                                 , new Uri("https://www.nuget.org", UriKind.Absolute));
-                   
+
                    options.Rules.Headers.AddDefaultSecurePolicy()
                                         .AddStrictTransportSecurityNoCache()
                                         .AddXssProtectionBlockAndReport()
@@ -104,12 +100,13 @@ namespace Walter.Web.FireWall.Geo.IP2Loaction
 
 
                }).UseDatabase(connectionString: Configuration.GetConnectionString("fireWallStateIP2Location"), schema: "firewall", dataRetention: TimeSpan.FromDays(365))
-                .UseUserAgentDBStore(connectionString: Configuration.GetConnectionString("fireWallUserAgent"),schema:"agent");
+                .UseUserAgentDBStore(connectionString: Configuration.GetConnectionString("fireWallStateIP2Location"), schema: "agent");
 
 
             //make json serialization easier when dealing with web api calls
             services.AddControllersWithViews()
-                .AddNewtonsoftJson(options=> {
+                .AddNewtonsoftJson(options =>
+                {
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                     options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 });

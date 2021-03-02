@@ -1,0 +1,72 @@
+﻿@model Walter.Web.FireWall.Geo.IP2Loaction.Models.WhoisQueryResult
+@inject Walter.Web.FireWall.IPageRequest _page
+
+@{
+    ViewData["Title"] = "Home Page - IWhois viewer";
+}
+
+<div class="text-center" firewall-userTypes-is-Malicious="true", firewall-userTypes-is-bot="true">
+    <h1 class="display-4">You are not welcome here</h1>
+    <p>
+        We have evaluated your activity and refuse to show this page
+    </p>
+</div>
+
+<div class="text-center" firewall-userTypes-is-Malicious="false", firewall-userTypes-is-bot="false">
+      @await Html.PartialAsync("_whois", Model as WhoisQuery)
+</div>
+@if(Model.Whois !=null)
+{
+	<div>
+        <h3>@Model.Whois.Organization</h3>
+        <address>
+            @Model.Whois.OrganizationAddress
+        </address>
+        <span>IP address range</span>
+        <ul>
+            @foreach (var ip in Model.Whois.IpAddresses)
+            {
+                <li>@ip.From - @ip.Till</li>
+            }
+        </ul>
+        <span>DnsName : </span><span>@Model.Whois.DnsName</span> <br />
+        <span>Domain : </span><span>@Model.Whois.Domain</span> <br />
+        <span>Record Created : </span><span>@Model.Whois.Created</span> <br />
+        <span>Last Changed : </span><span>@Model.Whois.Changed</span> <br />
+        <span>Legal Jurisdiction : </span><span>@Model.Whois.Country</span> <br />
+        <span>Contact details: </span>
+        <ul>
+            @foreach (var address in Model.Whois.ContactDetails)
+            {
+                <li>
+                    <span><span><strong> @address.Name</strong></span></span>
+                    <address>
+                        <span>Contact Type/ Role :<strong> @address.ContactType</strong></span><br />
+                        @if (!string.IsNullOrEmpty(address.Address))
+                        {
+                            @foreach (var item in address.Address.Split(System.Environment.NewLine))
+                            {
+                                <span>&nbsp; @item</span><br />
+                            }
+                        }
+                        <span>Phone: @address.Phone</span><br />
+                        <span>Fax: @address.Fax</span><br />
+                        @if (address.IsAbuse)
+                        {
+                            <span>Report abuse email: @address.EMail</span><br />
+                        }
+                        else
+                        {
+                            <span>Email: @address.EMail</span><br />
+                        }
+                    </address>
+                </li>
+            }
+        </ul>
+        <span>WhoIsProvider: </span><span>@Model.Whois.WhoIsProvider</span> <br />
+        <span>Status: </span><span>@Model.Whois.Status</span> <br />
+        <span>Refer : </span><span>@Model.Whois.Refer</span> <br />
+        <span>Remarks : </span><span>@Model.Whois.Remarks</span><br />
+        <span>Firewall status: @_page.FireWall.License.LicenseKey.Status - @_page.FireWall.License.LicenseKey.LicenseLevel </span>
+    </div>
+}

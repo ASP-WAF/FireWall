@@ -7,9 +7,9 @@
   <ItemGroup>
     <PackageReference Include="IP2Location.IPGeolocation" Version="8.6.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Walter.Web.FireWall" Version="2021.3.1.12" />
-    <PackageReference Include="Walter.Web.FireWall.DefaultEndpoints" Version="2021.3.1.12" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
+    <PackageReference Include="Walter.Web.FireWall" Version="2021.3.2.1415" />
+    <PackageReference Include="Walter.Web.FireWall.DefaultEndpoints" Version="2021.3.2.1415" />
   </ItemGroup>
 
 </Project>

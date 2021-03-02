@@ -132,7 +132,32 @@ namespace MVC_Core_31_Application
 
 
             })//store firewall state in a database making the firewall faster and allow it for the firewall to maintain large data volumes
-                .UseDatabase(connectionString: Configuration.GetConnectionString("FireWallState"), schema: "dbo", dataRetention: TimeSpan.FromDays(90));
+             .UseDatabase(connectionString: Configuration.GetConnectionString("FireWallState"), schema: "dbo", dataRetention: TimeSpan.FromDays(90))
+             //use email reporting send emails 1x per day
+             .UseSMTPReportingDatabase(connectionString: Configuration.GetConnectionString("FireWallState"), options => {
+                    //keep mails for 60 days
+                    options.Archive = TimeSpan.FromDays(60);                    
+                    //template subject line will replace domain name with the actual domain name
+                    options.Subject = "{Domain} incident report";
+                    //smtp settings
+                    options.From = "noreply@mydomain.com";
+                    options.IgnoreServerCertificateErrors = true;
+                    options.Server = "mail.mydomain.com";
+                    options.Port = 8844;                   
+                    options.UserName = "mailUserName";
+                    options.Password = "mail password";
+                    options.UseSsl = true;
+                    //receivers of the reports as well as specify what reports to send
+                    options.MailingList.Add(new EMailAddress("Admin", "admin@mydomain.com"){ 
+                                    Frequency = TimeSpan.FromDays(1), 
+                                    Roles = EMailRoles.SecurityRelevant }
+                                    );
+                    options.MailingList.Add(new EMailAddress("DEV", "developers@mydomain.com"){ 
+                                    Frequency = TimeSpan.FromDays(1), 
+                                    Roles = EMailRoles.ProductUpdates }
+                                    );
+
+                    });
 
             //configure the firewall to be active on each request by registering the firewall filter
             services.AddMvc(setupAction =>
