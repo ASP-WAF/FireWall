@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcFireWallHelperService";
+// The greeting service definition.
+service IPAdressBlocker {
+  // Sends a greeting
+  rpc Block (BlockRequest) returns (BlockReply);
+}
+
+// The request message containing the user's name.
+message BlockRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings.
+message BlockReply {
+  string message = 1;
+}

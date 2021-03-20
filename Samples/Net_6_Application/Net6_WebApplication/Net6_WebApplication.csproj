@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <Authors>Walter Verhoeven</Authors>
+    <Company>Computer Aided Trading Systems SA</Company>
+    <Product>Net6 Demo WebApplication</Product>
+    <Description>Demmo application with .Net 6 framework</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/ASP-WAF/FireWall</RepositoryUrl>
+    <PackageProjectUrl>https://www.asp-waf.com</PackageProjectUrl>
+    <PackageTags />
+    <PackageReleaseNotes>initial demo</PackageReleaseNotes>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Net6Demo.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.0-preview.1.21103.6" />
+    <PackageReference Include="Walter.Web.FireWall" Version="2021.3.3.1259" />
+  </ItemGroup>
+
+</Project>
