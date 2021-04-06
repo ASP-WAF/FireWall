@@ -40,7 +40,7 @@ namespace MVC_Core_31_Application.Controllers
         /// there is also a Json version allowing you to automate monitoring
         /// </remarks>
         /// <returns>the text report of the firewall, </returns>
-        [Ignore(skip: FireWallGuardModules.API_ENDPOINT_LAX)]
+        [Ignore(skip: FireWallGuardActions.API_ENDPOINT_LAX)]
         [NoCache]
         [HttpGet("API/Reporting/Text")]
         public string Get()
@@ -114,7 +114,8 @@ namespace MVC_Core_31_Application.Controllers
         [HttpGet]
         [NoCache]
         [Route(Links.UserEndpointJavaScript)]
-        [Ignore(Walter.Web.FireWall.Filters.FireWallGuardModules.EmbeddedResources)]
+        [Ignore(Walter.Web.FireWall.Filters.FireWallGuardActions.EmbeddedResources)]
+        [FireWallConfiguration(FireWallConfigurationElement.DiscoveryJavaScript)]
         public FileContentResult ValidateUser()
         {
             //use the ID to force reloading the script after the user has logged in or logged off
@@ -130,51 +131,59 @@ namespace MVC_Core_31_Application.Controllers
                 }
                 else
                 {
-                    _logger?.LogError("ValidateUser javascript generation failed for {Page}", _page.ToString());
-                    javaScript = UTF8Encoding.UTF8.GetBytes($"console.log('could not generate userValidation')");
+                    _logger?.Lazy().LogError("ValidateUser javascript generation failed for {Page}", _page.ToString());
+                    javaScript = System.Text.UTF8Encoding.UTF8.GetBytes($"console.log('could not generate userValidation')");
                     return File(fileContents: javaScript, contentType: "text/javascript");
                 }
             }
             catch (ArgumentException e)
             {
+                _page.Exception = e;
+
                 _fireWall.LogException<RunTimeErrors>(RunTimeErrors.ArgumentNullException, e, "Missing a configuration element or using wrong release for your deployment");
                 var javaScript = System.Diagnostics.Debugger.IsAttached
-                    ? UTF8Encoding.UTF8.GetBytes($"console.log('could not generate userValidation due to {e.Message}')")
-                    : UTF8Encoding.UTF8.GetBytes($"//Validate log {DateTime.Now} for errors and update settings");
+                    ? System.Text.UTF8Encoding.UTF8.GetBytes($"console.log('could not generate userValidation due to {e.Message}')")
+                    : System.Text.UTF8Encoding.UTF8.GetBytes($"//Validate log {DateTime.Now} for errors and update settings");
                 return File(fileContents: javaScript, contentType: "text/javascript");
             }
             catch (Exception e)
             {
+                _page.Exception = e;
+
                 _fireWall.LogException<RunTimeErrors>(RunTimeErrors.ArgumentNullException, e, $"User type discovery will not work as good as it could please fix {e.Message}");
-                var javaScript = UTF8Encoding.UTF8.GetBytes($"console.log('could not generate userValidation due to {e.Message}')");
+                var javaScript = System.Text.UTF8Encoding.UTF8.GetBytes($"console.log('could not generate userValidation due to {e.Message}')");
                 return File(fileContents: javaScript, contentType: "text/javascript");
             }
             finally
             {
-                _logger?.LogInformation("ValidateUser called");
+                _logger?.Lazy().LogInformation("ValidateUser called");
             }
         }
 
         [HttpPost]
         [Route(Links.BeaconPoint)]
-        [DisableFirewall]
-        [CrossSite(useDefaultRedirect: false), Ignore(skip: FireWallGuardModules.ALL & ~FireWallGuardModules.RejectCrossSiteRequests)]
-        public StatusCodeResult Beacon(string model)
+        [CrossSite, Ignore(skip: FireWallGuardActions.ALL & ~FireWallGuardActions.RejectCrossSiteRequests)]
+        [ModelFilter(associations: RequestersAssociations.InCurrentPage, generateIncident: false)]
+        [FireWallConfiguration(FireWallConfigurationElement.Beacon)]
+        public StatusCodeResult Beacon([FromBody] Beacon model)
         {
-            if (!string.IsNullOrEmpty(model))
+            if (!ModelState.IsValid)
             {
-                var beacon = JsonConvert.DeserializeObject<Beacon>(model);
-                _fireWall.ModelIsValid(pageContext: _page, model: beacon, out var errors);
-                if (errors.Sum(s => s.BlockinSeverityScore) < 100)
+                _logger?.Lazy().LogWarning("beacon: failed has {errors} errors", ModelState.ErrorCount);
+                return this.Ok();//no need to make a fuss
+            }
+
+
+            _fireWall.ModelIsValid(pageContext: _page, model: model, out var errors);
+            if (errors.Sum(s => s.BlockingSeverityScore) < 100)
+            {
+                _fireWall.LogPageRequest(model, _page);
+            }
+            else
+            {
+                foreach (var error in errors)
                 {
-                    _fireWall.LogPageRequest(beacon, _page);
-                }
-                else
-                {
-                    foreach (var error in errors)
-                    {
-                        _logger?.LogWarning("beacon: {warn}", error);
-                    }
+                    _logger?.Lazy().LogWarning("beacon: {warn}", error);
                 }
             }
             return this.Ok();
@@ -182,63 +191,30 @@ namespace MVC_Core_31_Application.Controllers
 
         [HttpPost]
         [Route(Links.IsUserEndpoint)]
-        [CrossSite(useDefaultRedirect: false), Ignore(skip: FireWallGuardModules.ALL & ~FireWallGuardModules.RejectCrossSiteRequests)]
-        public StatusCodeResult UserDiscovery([FromBody] Discovery model)
+        [CrossSite, Ignore(skip: FireWallGuardActions.ALL & ~FireWallGuardActions.RejectCrossSiteRequests)]
+        [FireWallConfiguration(FireWallConfigurationElement.DiscoveryModel)]
+        public StatusCodeResult UserDiscovery([FromBody] string json)
         {
-            if (model is null)
+            if (_page.TryLogDiscovery(json))
             {
-                _logger?.LogInformation("user discovery called but the model field or data types are not compatible, please wait, update the model to fix the users discovery javascript");
-                return this.NoContent();
+                return Ok();
             }
-            else
-            {
-                _fireWall.ModelIsValid(pageContext: _page, model: model, out var errors);
-                if (errors.Count == 0 || (errors.Count > 0 && errors.Sum(s => s.BlockinSeverityScore) < 100))
-                {
-                    _fireWall.LogPageRequest(model, _page);
-                    return Ok();
-                }
-                else
-                {
-                    _logger?.LogWarning("Assume an attempt was made to send a tampered model to {url} due to it achieving an error score of {score}", _page.OriginalUrl.AbsoluteUri, errors.Sum(s => s.BlockinSeverityScore));
-                    if (errors.Sum(s => s.BlockinSeverityScore) > 100)
-                    {
-                        var fwu = _page.User.AsFirewallUser();
-                        using (var scope = _logger?.BeginScope<string>($"User {fwu.Id} from {fwu.IPAddress} tampered with the model send back to {Links.IsUserEndpoint} and triggered {errors.Count} warnings"))
-                        {
-                            for (var i = 0; i < errors.Count; i++)
-                            {
-                                _logger?.LogWarning("incident:{count} reason:{reason} context:{context} weight:{weight}", i + 1, errors[i].Reason, errors[i].BlockingContext, errors[i].BlockinSeverityScore);
-                            }
-                        }
-                        //tamper detected so return a 404
-                        return this.NotFound();
-                    }
-                    //model data is not valid, could be tampered but could also just be not containing required values
-                    return this.BadRequest();
-                }
-            }
+            return this.BadRequest();
         }
 
         [HttpPost]
         [Route(Links.SiteMapEndPoint)]
-        [CrossSite(useDefaultRedirect: false), Ignore(skip: FireWallGuardModules.ALL & ~FireWallGuardModules.RejectCrossSiteRequests)]
-        public async Task<StatusCodeResult> SiteMap([FromBody] SiteMapDiscovery model)
+        [CrossSite(useDefaultRedirect: false), Ignore(skip: FireWallGuardActions.ALL & ~FireWallGuardActions.RejectCrossSiteRequests)]
+        [FireWallConfiguration(FireWallConfigurationElement.SiteMapModel)]
+        public async Task<StatusCodeResult> SiteMap([FromBody] string json)
         {
-            _logger.Lazy().LogInformation("Url discovery called");
-
-            if (model is null)
-                return NoContent();
+            if (_page.TryLogSiteMap(json))
+            {
+                return Ok();
+            }
             else
             {
-                _fireWall.ModelIsValid(pageContext: _page, model: model, out var errors);
-
-                if (errors.Sum(s => s.BlockinSeverityScore) < 100 && _page.RootPage != null)
-                {
-                    _logger.Lazy().LogDebug("Url discovery send to firewall");
-                    await _fireWall.LogSiteMapAsync(page: _page, model: model).ConfigureAwait(false);
-                }
-                return Ok();
+                return BadRequest();
             }
         }
 

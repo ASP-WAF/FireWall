@@ -37,7 +37,7 @@ namespace Walter.Web.FireWall.Geo.IP2Loaction.Controllers
                                                     , blockDurationInSeconds: 6
                                                     , redirectToController: "home"
                                                     , redirectToAction: "index"
-                                                    , id: (int)Filters.FireWallGuardModules.RejectRefreshViolations)]
+                                                    , id: (int)Filters.FireWallGuardActions.RejectRefreshViolations)]
         public async Task<IActionResult> Query(WhoisQuery model)
         {
 
@@ -65,7 +65,7 @@ namespace Walter.Web.FireWall.Geo.IP2Loaction.Controllers
         /// Allow the user to get 5 visits to the block page 
         /// </summary>
         /// <returns></returns>
-        [Walter.Web.FireWall.Annotations.Ignore(skip: Filters.FireWallGuardModules.ALL, skipCount: 5)]
+        [Walter.Web.FireWall.Annotations.Ignore(skip: Filters.FireWallGuardActions.ALL, skipCount: 5)]
         public IActionResult Blocked()
         {
 
