@@ -34,7 +34,7 @@ namespace Walter.Web.FireWall.Geo.IP2Loaction.Infrastructure
             foreach (var item in data)
             {
                 item.AddHock = null;
-                item.NoValidate = Filters.FireWallGuardModules.RejectAddHockRequests | Filters.FireWallGuardModules.RejectCrossSiteRequests;
+                item.NoValidate = Filters.FireWallGuardActions.RejectAddHockRequests | Filters.FireWallGuardActions.RejectCrossSiteRequests;
 
             }
             data = KnownLinks.EndpointsInPath("*.css", "*.png", "*.jpg", "*.js");
