@@ -181,7 +181,7 @@ namespace Walter.Web.FireWall.Geo.IP2Loaction.Infrastructure
             e.AllowRaiseIncident = true;
 
             // It's no big deal if the user refreshes the page
-            if (e.Page.HasViolated(Filters.FireWallGuardModules.RejectRefreshViolations))
+            if (e.Page.HasViolated(Filters.FireWallGuardActions.RejectRefreshViolations))
             { 
                 e.AllowRaiseIncident = false;
             }
