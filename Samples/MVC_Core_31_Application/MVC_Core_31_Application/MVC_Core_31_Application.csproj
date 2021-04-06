@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Walter.Web.Firewall" Version="2021.3.2.1415" />
-    <PackageReference Include="Walter.Web.FireWall.SMTPLogger" Version="2021.3.2.1415" />
+    <PackageReference Include="Walter.Web.Firewall" Version="2021.4.5.1653" />
+    <PackageReference Include="Walter.Web.FireWall.SMTPLogger" Version="2021.4.5.1653" />
   </ItemGroup>
 
 </Project>
