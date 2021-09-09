@@ -226,6 +226,10 @@ setting the database explicitly
 More information and samples can be found at the online [UserAgentDBStore]( 
 https://firewallapi.asp-waf.com/?topic=html/M-Microsoft.Extensions.DependencyInjection.FireWallBuilderExtensions.UseUserAgentDBStore--1_1.htm) documentation
 
+	
+## Remote Desktop
+You can observe the firewall's recomedation in real-time by using the open source project [asp-waf desktop](https://www.asp-waf.com/abuse). The desk top will allo you to monitor, perform quick actions as well as generate abuse reports that can be send to internet service providers. The best ios that you can alter the desktop to fit your needs as it is open source. You can get the .NET 5.0 PRISM WPF by [downloading the source here](https://github.com/PeterPann23/FireWallDesktop) 	
+	
 ### LICENSE
 You can try the firewall using the trial keys or register your own version today go and get your own license at https://www.asp-waf.com and register your copy today.
 
@@ -234,3 +238,4 @@ Users with a license level of Trial, Community or Base may exchange known malici
 with the subscription server. If you do not wish to participate with the data improvement program
 you will need to get a Small business or enterprise license
 
+	
