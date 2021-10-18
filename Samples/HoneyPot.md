@@ -7,11 +7,11 @@ The honey pot detector allows to detect and interact with applications that are 
 Integrating the honey-pot listener takes 3 steps.
 
 ### step 1:
-Foreword ports in your edge-switch to ports monitored by the honey-pot configuration. A recommendation is to map the ports to a free port not used by the server. 
+Foreword ports in your edge switch to ports monitored by the honey-pot configuration. A recommendation is to map the ports to a free port not used by the server. 
 An example map port 22 to port 60022 and configure the honey-port to watch any communication on port 4000
 
 ### step 2
-Configure the firewall to allow the communication on port 4000.  
+Configure the firewall to allow communication on port 4000.  
   
 ### step 3
 Configure the application to subscribe to the port detections. To do this in the firewall you should use a configuration similar to this:
@@ -41,7 +41,7 @@ services.AddFireWall()
                    /*Look between every 100ms and 30000ms if someone is trying to gain access to the system */
                    options.PoolFrequency = 100;
 
-                   /* Add a default reply to any connection, you can send a auto reply 
+                   /* Add a default reply to any connection, you can send an auto-reply 
                     * You can use the template values:
                     * {IP}  - the attackers IP address
                     * {Port}- the port being attacked
@@ -57,9 +57,8 @@ services.AddFireWall()
 
 ````
 The above code assumes that you are using the FireWall from NuGet package [Walter.Web.FireWall](https://www.nuget.org/packages/Walter.Web.FireWall/). 
-If you are using any of the services that you are monitoring then then map the default ports to custom ports on your router there are 2 steps for this:
+If you are using any of the services that you are monitoring then map the default ports to custom ports on your router there are 2 steps for this:
 1. Map the custom port on the router, an example map 222 to port 22 
 2. Use port 222 to connect using SSH 
 
-Please note that a lot attackers are looking for victims using port scanners to target venerable IP addresses before attacking a system. You can [have a look here](https://www.asp-waf.com/Reporting) and see how these attacks are being executed.
-
+Please note that a lot of attackers are looking for victims using port scanners to target venerable IP addresses before attacking a system. You can [have a look here](https://www.asp-waf.com/Reporting) and see how these attacks are being executed.
