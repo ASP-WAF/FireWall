@@ -1,4 +1,4 @@
-#About the Honey-Pot detector
+# About the Honey-Pot detector
 
 The honey pot detector allows to detect and interact with applications that are attempting to communicate with your server via a particular port. Understanding who is maliciously trying to exploit the system helps identify bad actors and will allow you to tune the system alerting an attempt by a system classified as being a bad actor and will allow the framework to block any requests and or return a payload. 
 
