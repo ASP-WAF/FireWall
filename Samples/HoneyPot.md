@@ -61,6 +61,5 @@ If you are using any of the services that you are monitoring then then map the d
 1. Map the custom port on the router, an example map 222 to port 22 
 2. Use port 222 to connect using SSH 
 
-Please note that a lot attackers are looking for vicems using port scaners to target vunerable IP addresses before attacking a system. You can [have a look](https://www.asp-waf.com/Reporting) at how these attacks are beding executed. 
-
+Please note that a lot attackers are looking for victims using port scanners to target venerable IP addresses before attacking a system. You can [have a look here](https://www.asp-waf.com/Reporting) and see how these attacks are being executed.
 
