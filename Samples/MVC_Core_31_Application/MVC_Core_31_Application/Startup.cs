@@ -93,8 +93,9 @@ namespace MVC_Core_31_Application
             services.AddFireWall<MyFireWall>(FireWallTrial.License, FireWallTrial.DomainKey, new Uri("https://www.mydomain.com", UriKind.Absolute), options =>
 
             {
-
-
+                //use nuget package default endpoints to enable firewall management dashboard, than use administration to manage it
+                options.Administration.GenerateConnectFile = false;
+                
                 options.Cypher.ApplicationPassword = "The password is 5 x 5, but I will not say in what order!";
                 options.UseSession = true;
 
@@ -162,10 +163,7 @@ namespace MVC_Core_31_Application
             //configure the firewall to be active on each request by registering the firewall filter
             services.AddMvc(setupAction =>
             {
-                //enable the firewall on all endpoints in this application 
-                setupAction.Filters.Add<Walter.Web.FireWall.Filters.FireWallFilter>();
-                //inform the browser of our privacy policy if you render views
-                
+                //inform the browser of our privacy policy if you render views                
                 setupAction.Filters.Add<Walter.Web.FireWall.Filters.PrivacyPreferencesFilter>();
                 //view the filter documentation at https://firewallapi.asp-waf.com/?topic=html/N-Walter.Web.FireWall.Filters.htm
 
